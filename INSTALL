@@ -1,0 +1,9 @@
+Recommended out of tree build:
+
+mkdir build
+cd build
+cmake ../
+make
+make install
+
+

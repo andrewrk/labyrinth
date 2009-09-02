@@ -18,6 +18,8 @@ class Maze {
         inline int endX() const { return m_endX; }
         inline int endY() const { return m_endY; }
 
+        void print() const;
+
     private:
         typedef struct {
             bool backtrack;

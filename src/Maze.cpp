@@ -116,19 +116,18 @@ void Maze::generateMaze() {
             curr = cellStack.back();
             cellStack.pop_back();
         }
-
-        // trace the maze
-        string mapStr = "";
-        for(int y=0;y<m_height;y++){
-            for(int x=0;x<m_width;x++){
-                mapStr += m_maze.get(x,y).s.wall ? "_" : " ";
-                mapStr += m_maze.get(x,y).e.wall ? "|" : " ";
-            }
-            mapStr += "\n";
-        }
-        cout << mapStr;
-
-
-
     }
+}
+
+void Maze::print() const {
+    // trace the maze
+    string mapStr = "";
+    for(int y=0;y<m_height;y++){
+        for(int x=0;x<m_width;x++){
+            mapStr += m_maze.get(x,y).s.wall ? "_" : " ";
+            mapStr += m_maze.get(x,y).e.wall ? "|" : " ";
+        }
+        mapStr += "\n";
+    }
+    cout << mapStr;
 }

@@ -3,6 +3,10 @@ using namespace std;
 
 #include "GL/glut.h"
 
+
+#include "Maze.h"
+
+
 int main(int argc, char *argv[]);
 void init();
 void mouse(GLint button, GLint action, GLint x, GLint y);
@@ -11,6 +15,10 @@ void display();
 
 
 int main(int argc, char *argv[]) {
+    // maze test
+    Maze maze(10,10);
+    maze.print();
+
     glutInit(&argc, argv);
 
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);

@@ -18,6 +18,9 @@ class Maze {
         inline int endX() const { return m_endX; }
         inline int endY() const { return m_endY; }
 
+        inline int width() const { return m_width; }
+        inline int height() const { return m_height; }
+
         void print() const;
 
     private:

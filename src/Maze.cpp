@@ -121,9 +121,13 @@ void Maze::generateMaze() {
 
 void Maze::print() const {
     // trace the maze
-    string mapStr = "";
-    for(int y=0;y<m_height;y++){
-        for(int x=0;x<m_width;x++){
+    string mapStr = "_";
+    for(int x=0; x<m_width; ++x)
+        mapStr += "__";
+    mapStr += "\n";
+    for(int y=0;y<m_height;++y){
+        mapStr += "|";
+        for(int x=0;x<m_width;++x){
             mapStr += m_maze.get(x,y).s.wall ? "_" : " ";
             mapStr += m_maze.get(x,y).e.wall ? "|" : " ";
         }

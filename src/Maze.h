@@ -9,10 +9,20 @@
 
 class Maze {
     public:
+        // types
+        enum Direction {
+            North = 0,
+            South,
+            East,
+            West
+        };
+
+        // ctor
         Maze(int width, int height);
         Maze(int width, int height, int startX, int startY, int endX, int endY);
         ~Maze();
 
+        // accessors
         inline int startX() const { return m_startX; }
         inline int startY() const { return m_startY; }
         inline int endX() const { return m_endX; }
@@ -21,20 +31,15 @@ class Maze {
         inline int width() const { return m_width; }
         inline int height() const { return m_height; }
 
+        // does the cell have a wall in direction
+        bool cellHasWall(int x, int y, Direction dir) const;
+
+        // print ascii to stdout
         void print() const;
 
     private:
         typedef struct {
-            bool backtrack;
-            bool solution;
-            bool wall;
-        } CellWall;
-
-        typedef struct {
-            CellWall n;
-            CellWall s;
-            CellWall e;
-            CellWall w;
+            bool wall[4]; //n,s,e,w
             int x;
             int y;
         } MazeCell;

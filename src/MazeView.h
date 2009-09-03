@@ -11,16 +11,17 @@ class MazeView {
         // size.x - x component of the 2d maze
         // size.y - y compenent of the 2d maze
         // size.z - how tall the walls go up
-        MazeView(Maze & maze, Vec3<float> pos, Vec3<float> size);
+        MazeView(const Maze &maze, const Vec3<float> &pos,
+            const Vec3<float> &size);
         ~MazeView();
 
         // render with opengl
         void display();
 
     private:
-        Maze & m_maze;
-        Vec3<float> m_pos;
-        Vec3<float> m_size;
+        const Maze & m_maze;
+        const Vec3<float> & m_pos;
+        const Vec3<float> & m_size;
         Vec3<float> m_sectorSize;
 };
 

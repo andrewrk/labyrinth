@@ -11,6 +11,10 @@ int main(int argc, char *argv[]);
 void init();
 void reshape(GLint w, GLint h);
 void mouse(GLint button, GLint action, GLint x, GLint y);
+void keyDown(unsigned char key, int x, int y);
+void keyUp(unsigned char key, int x, int y);
+void specialKeyDown(int key, int x, int y);
+void specialKeyUp(int key, int x, int y);
 void motion(GLint x, GLint y);
 void display();
 void nextFrame();
@@ -23,7 +27,6 @@ int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
 
     glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGB);
-    //glutInitWindowPosition(0,0);
     glutInitWindowSize(800, 600);
     glutCreateWindow("Labyrinth");
 
@@ -31,9 +34,13 @@ int main(int argc, char *argv[]) {
 
     glutDisplayFunc(display);
     glutMouseFunc(mouse);
-    //glutMotionFunc(motion); // mouse motion
+    glutMotionFunc(motion); // mouse motion
     glutReshapeFunc(reshape);
     glutIdleFunc(nextFrame);
+    glutKeyboardFunc(keyDown);
+    glutKeyboardUpFunc(keyUp);
+    glutSpecialFunc(specialKeyDown);
+    glutSpecialUpFunc(specialKeyUp);
 
     glutMainLoop();
     return 0;
@@ -43,6 +50,8 @@ void init() {
     // initialize opengl
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glShadeModel(GL_FLAT);
+
+    glutIgnoreKeyRepeat(true);
 
     // initialize program
     // create maze object
@@ -59,6 +68,38 @@ void display() {
     glPopMatrix();
 
     glutSwapBuffers();
+}
+
+void keyDown(unsigned char key, int x, int y) {
+}
+
+void keyUp(unsigned char key, int x, int y) {
+}
+
+void specialKeyDown(int key, int x, int y) {
+    switch(key) {
+        case GLUT_KEY_LEFT:
+            break;
+        case GLUT_KEY_RIGHT:
+            break;
+        case GLUT_KEY_UP:
+            break;
+        case GLUT_KEY_DOWN:
+            break;
+    }
+}
+
+void specialKeyUp(int key, int x, int y) {
+    switch(key) {
+        case GLUT_KEY_LEFT:
+            break;
+        case GLUT_KEY_RIGHT:
+            break;
+        case GLUT_KEY_UP:
+            break;
+        case GLUT_KEY_DOWN:
+            break;
+    }
 }
 
 void nextFrame() {
@@ -98,5 +139,4 @@ void mouse(GLint button, GLint action, GLint x, GLint y) {
 }
 
 void motion( int x, int y ){
-    cout << "x: " << x << " y: " << y << endl;
 }

@@ -32,13 +32,13 @@ void MazeView::display() {
                 m_pos.y + ((float)y) * m_sectorSize.y, 0);
 
             // floor
-            //glColor3f(0.1, 0.1, 0.9);
-            //glBegin(GL_POLYGON);
-                //glVertex3f(loc.x, loc.y, loc.z);
-                //glVertex3f(loc.x, loc.y+m_sectorSize.y, loc.z);
-                //glVertex3f(loc.x+m_sectorSize.x, loc.y+m_sectorSize.y, loc.z);
-                //glVertex3f(loc.x+m_sectorSize.x, loc.y, loc.z);
-            //glEnd();
+            glColor3f(0.1, 0.1, 0.9);
+            glBegin(GL_POLYGON);
+                glVertex3f(loc.x, loc.y, loc.z);
+                glVertex3f(loc.x, loc.y+m_sectorSize.y, loc.z);
+                glVertex3f(loc.x+m_sectorSize.x, loc.y+m_sectorSize.y, loc.z);
+                glVertex3f(loc.x+m_sectorSize.x, loc.y, loc.z);
+            glEnd();
             
             // north
             if( m_maze.cellHasWall(x,y,Maze::South) ) {

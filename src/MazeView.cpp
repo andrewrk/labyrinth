@@ -14,7 +14,8 @@ MazeView::MazeView(const Maze &maze, const Vec3<float> &pos,
 
     m_postSize.x = m_sectorSize.y / 10;
     m_postSize.y = m_sectorSize.x / 10;
-    m_postSize.z = m_sectorSize.z;
+    m_postSize.z = m_sectorSize.z * 1.2;
+
 }
 
 MazeView::~MazeView() {
@@ -32,12 +33,12 @@ void MazeView::display() {
                 m_pos.y + ((float)y) * m_sectorSize.y, 0);
 
             // floor
-            glColor3f(0.1, 0.1, 0.9);
+            glColor3f(0.1, 0.1, 0.5);
             glBegin(GL_POLYGON);
-                glVertex3f(loc.x, loc.y, loc.z);
-                glVertex3f(loc.x, loc.y+m_sectorSize.y, loc.z);
-                glVertex3f(loc.x+m_sectorSize.x, loc.y+m_sectorSize.y, loc.z);
                 glVertex3f(loc.x+m_sectorSize.x, loc.y, loc.z);
+                glVertex3f(loc.x+m_sectorSize.x, loc.y+m_sectorSize.y, loc.z);
+                glVertex3f(loc.x, loc.y+m_sectorSize.y, loc.z);
+                glVertex3f(loc.x, loc.y, loc.z);
             glEnd();
             
             // north
@@ -50,7 +51,7 @@ void MazeView::display() {
                     loc+Vec3<float>(m_sectorSize.x-m_postSize.x, -m_postSize.y,
                         0),
                     loc+Vec3<float>(m_postSize.x, -m_postSize.y, 0),
-                    m_postSize.z);
+                    m_sectorSize.z);
             }
 
             // west
@@ -63,8 +64,17 @@ void MazeView::display() {
                         0),
                     loc+Vec3<float>(-m_postSize.x, -m_sectorSize.y+m_postSize.y,
                         0),
-                    m_postSize.z);
+                    m_sectorSize.z);
             }
+
+            // place a post
+            glColor3f(0.59, 0.65, 0.74);
+            cuboid(
+                loc+Vec3<float>(-m_postSize.x, m_postSize.y, 0),
+                loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
+                loc+Vec3<float>(m_postSize.x, -m_postSize.y, 0),
+                loc+Vec3<float>(-m_postSize.x, -m_postSize.y, 0),
+                m_postSize.z);
         }
     }
 }

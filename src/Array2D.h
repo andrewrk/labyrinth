@@ -38,12 +38,12 @@ Array2D<T>::~Array2D() {
 
 template <class T>
 T& Array2D<T>::get(int x, int y) const {
-    return m_array[y*m_height+x];
+    return m_array[y*m_width+x];
 }
 
 template <class T>
 void Array2D<T>::set(int x, int y, T item) {
-    m_array[y*m_height+x] = item;
+    m_array[y*m_width+x] = item;
 }
 
 template <class T>

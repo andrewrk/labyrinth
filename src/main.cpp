@@ -17,7 +17,6 @@ void keyDown(unsigned char key, int x, int y);
 void keyUp(unsigned char key, int x, int y);
 void specialKeyDown(int key, int x, int y);
 void specialKeyUp(int key, int x, int y);
-void motion(GLint x, GLint y);
 void display();
 void nextFrame();
 
@@ -28,18 +27,19 @@ Camera * camera;
 bool keyState[256] = {0};
 bool specialKeyState[256] = {0};
 
+int formWidth = 800, formHeight = 600;
+
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
 
     glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
-    glutInitWindowSize(800, 600);
+    glutInitWindowSize(formWidth, formHeight);
     glutCreateWindow("Labyrinth");
 
     init();
 
     glutDisplayFunc(display);
     glutMouseFunc(mouse);
-    glutMotionFunc(motion); // mouse motion
     glutReshapeFunc(reshape);
     glutIdleFunc(nextFrame);
     glutKeyboardFunc(keyDown);
@@ -56,6 +56,10 @@ void init() {
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glShadeModel(GL_FLAT);
     glutIgnoreKeyRepeat(true);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
 
     // initialize program
     // create maze object
@@ -65,12 +69,13 @@ void init() {
     // create camera
     camera = new Camera(Vec3<float>(0, 0, 0.5),
         Vec3<float>(0,0,1),
-        Vec3<float>(1,1,0));
+        Vec3<float>(1,-1,0));
 
 }
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
 
     // Build Camera
     glMatrixMode(GL_MODELVIEW);
@@ -147,13 +152,14 @@ void nextFrame() {
 }
 
 void reshape(GLint w, GLint h) {
+    formWidth = w;
+    formHeight = h;
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 
     // build projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(80, 1.33, 0.01, 100);
-
+    gluPerspective(80, (float)formWidth / (float)formHeight, 0.01, 100);
 }
 
 void mouse(GLint button, GLint action, GLint x, GLint y) {
@@ -179,5 +185,3 @@ void mouse(GLint button, GLint action, GLint x, GLint y) {
     }
 }
 
-void motion( int x, int y ){
-}

@@ -6,6 +6,7 @@ using namespace std;
 
 #include "GL/glut.h"
 
+#define PI 3.14159265358979
 
 Camera::Camera(const Vec3<float> & pos, const Vec3<float> & up,
         const Vec3<float> & look) :
@@ -95,6 +96,7 @@ void Camera::rotateVecAboutVec(Vec3<float> & vec,
 }
 
 void Camera::pointLeft(float radians) {
+    radians = fmodf(radians, 2*PI);
     rotateVecAboutVec(m_look, Vec3<float>(0,0,1), radians);
     calcRefPoint();
 }
@@ -105,6 +107,7 @@ void Camera::pointRight(float radians) {
 
 void Camera::pointUp(float radians) {
     // rotate about left vector
+    radians = fmodf(radians, 2*PI);
     rotateVecAboutVec(m_look, m_look.cross(m_up), radians);
     calcRefPoint();
 }

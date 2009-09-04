@@ -24,7 +24,10 @@ class MazeView {
         const Vec3<float> & m_pos;
         const Vec3<float> & m_size;
         Vec3<float> m_sectorSize;
-        Vec3<float> m_wallSize;
+        Vec3<float> m_postSize;
+
+        void cuboid(Vec3<float> basePt1, Vec3<float> basePt2,
+            Vec3<float> basePt3, Vec3<float> basePt4, float height);
 };
 
 #endif

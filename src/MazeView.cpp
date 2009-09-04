@@ -29,53 +29,69 @@ void MazeView::display() {
     for(int x=0; x<m_maze.width(); ++x) {
         for(int y=0; y<m_maze.height(); ++y) {
             // rectangle from m_pos+x*m_sectorSize to m_pos+(x+1)*sectorSize
-            Vec3<float> loc( m_pos.x + ((float)x) * m_sectorSize.x,
+            Vec3<float> loc(
+                m_pos.x + ((float)x) * m_sectorSize.x,
                 m_pos.y + ((float)y) * m_sectorSize.y, 0);
 
             // floor
             glColor3f(0.1, 0.1, 0.5);
             glBegin(GL_POLYGON);
                 glVertex3f(loc.x+m_sectorSize.x, loc.y, loc.z);
-                glVertex3f(loc.x+m_sectorSize.x, loc.y+m_sectorSize.y, loc.z);
+                glVertex3f(loc.x+m_sectorSize.x, loc.y+m_sectorSize.y,
+                    loc.z);
                 glVertex3f(loc.x, loc.y+m_sectorSize.y, loc.z);
                 glVertex3f(loc.x, loc.y, loc.z);
             glEnd();
             
-            // north
+            // south
             if( m_maze.cellHasWall(x,y,Maze::South) ) {
-                glColor3f(0.1, 0.9, 0.1);
-                cuboid(
-                    loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
-                    loc+Vec3<float>(m_sectorSize.x-m_postSize.x, m_postSize.y,
-                        0),
-                    loc+Vec3<float>(m_sectorSize.x-m_postSize.x, -m_postSize.y,
-                        0),
-                    loc+Vec3<float>(m_postSize.x, -m_postSize.y, 0),
-                    m_sectorSize.z);
+                glColor3f(0.2, 0.8, 0.2);
+                horizWall(loc+Vec3<float>(0, m_sectorSize.y, 0));
+            }
+            // north
+            if( y == 0 && m_maze.cellHasWall(x,y,Maze::North) ) {
+                glColor3f(0.2, 0.8, 0.2);
+                horizWall(loc);
             }
 
-            // west
+            // east
             if( m_maze.cellHasWall(x,y,Maze::East) ) {
                 glColor3f(0.4, 0.4, 0.1);
-                cuboid(
-                    loc+Vec3<float>(-m_postSize.x, -m_postSize.y, 0),
-                    loc+Vec3<float>(m_postSize.x, -m_postSize.y, 0),
-                    loc+Vec3<float>(m_postSize.x, -m_sectorSize.y+m_postSize.y,
-                        0),
-                    loc+Vec3<float>(-m_postSize.x, -m_sectorSize.y+m_postSize.y,
-                        0),
-                    m_sectorSize.z);
+                vertWall(loc+Vec3<float>(m_sectorSize.x, 0, 0));
+            }
+            // west
+            if( x == 0 && m_maze.cellHasWall(x,y,Maze::West) ) {
+                glColor3f(0.4, 0.4, 0.1);
+                vertWall(loc);
             }
 
             // place a post
-            glColor3f(0.59, 0.65, 0.74);
-            cuboid(
-                loc+Vec3<float>(-m_postSize.x, m_postSize.y, 0),
-                loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
-                loc+Vec3<float>(m_postSize.x, -m_postSize.y, 0),
-                loc+Vec3<float>(-m_postSize.x, -m_postSize.y, 0),
-                m_postSize.z);
+            if( m_maze.cellHasWall(x,y-1,Maze::West) ||
+                (m_maze.cellHasWall(x,y-1,Maze::South)) ||
+                (m_maze.cellHasWall(x,y,Maze::West)) ||
+                (m_maze.cellHasWall(x-1,y-1,Maze::South)))
+            {
+                glColor3f(0.59, 0.65, 0.74);
+                renderPost(loc);
+            }
         }
+        int x = m_maze.width();
+        for(int y=0; y<m_maze.height(); ++y) {
+            Vec3<float> loc(
+                m_pos.x + ((float)x) * m_sectorSize.x,
+                m_pos.y + ((float)y) * m_sectorSize.y, 0);
+            glColor3f(0.59, 0.65, 0.74);
+            renderPost(loc);
+        }
+        int y = m_maze.height();
+        for(int x=0; x<m_maze.width(); ++x) {
+            Vec3<float> loc(
+                m_pos.x + ((float)x) * m_sectorSize.x,
+                m_pos.y + ((float)y) * m_sectorSize.y, 0);
+            glColor3f(0.59, 0.65, 0.74);
+            renderPost(loc);
+        }
+
     }
 }
 
@@ -109,4 +125,33 @@ void MazeView::cuboid(Vec3<float> basePt1, Vec3<float> basePt2,
         glVertex3f(basePt2.x, basePt2.y, basePt2.z+height);
         glVertex3f(basePt1.x, basePt1.y, basePt1.z+height);
     glEnd();
+}
+
+void MazeView::horizWall(Vec3<float> loc) {
+    cuboid(
+        loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
+        loc+Vec3<float>(m_sectorSize.x-m_postSize.x, m_postSize.y,
+            0),
+        loc+Vec3<float>(m_sectorSize.x-m_postSize.x, -m_postSize.y,
+            0),
+        loc+Vec3<float>(m_postSize.x, -m_postSize.y, 0),
+        m_sectorSize.z);
+}
+
+void MazeView::vertWall(Vec3<float> loc) {
+    cuboid(
+        loc+Vec3<float>(-m_postSize.x, m_sectorSize.y-m_postSize.y, 0),
+        loc+Vec3<float>(m_postSize.x, m_sectorSize.y-m_postSize.y, 0),
+        loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
+        loc+Vec3<float>(-m_postSize.x, m_postSize.y, 0),
+        m_sectorSize.z);
+}
+
+void MazeView::renderPost(Vec3<float> loc) {
+    cuboid(
+        loc+Vec3<float>(-m_postSize.x, m_postSize.y, 0),
+        loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
+        loc+Vec3<float>(m_postSize.x, -m_postSize.y, 0),
+        loc+Vec3<float>(-m_postSize.x, -m_postSize.y, 0),
+        m_postSize.z);
 }

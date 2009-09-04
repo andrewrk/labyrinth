@@ -28,6 +28,10 @@ class MazeView {
 
         void cuboid(Vec3<float> basePt1, Vec3<float> basePt2,
             Vec3<float> basePt3, Vec3<float> basePt4, float height);
+
+        void vertWall(Vec3<float> loc);
+        void horizWall(Vec3<float> loc);
+        void renderPost(Vec3<float> loc);
 };
 
 #endif

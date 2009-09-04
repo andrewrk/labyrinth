@@ -67,7 +67,7 @@ void init() {
     mazeView = new MazeView(*maze, Vec3<float>(0, 0, 0), Vec3<float>(20,20,1));
 
     // create camera
-    camera = new Camera(Vec3<float>(0, 0, 0.5),
+    camera = new Camera(Vec3<float>(1, 1, 0.5),
         Vec3<float>(0,0,1),
         Vec3<float>(1,-1,0));
 
@@ -111,40 +111,40 @@ void specialKeyUp(int key, int x, int y) {
 void nextFrame() {
     if( keyState[','] ) {
         // move camera forward in the direction it is facing
-        camera->moveForward(0.01);
+        camera->moveForward(0.03);
     } else if( keyState['o'] ) {
         // move camera backward in the direction it is facing
-        camera->moveBackward(0.01);
+        camera->moveBackward(0.03);
     }
 
     if( keyState['-'] ) {
-        camera->moveDown(0.01);
+        camera->moveDown(0.03);
     } else if( keyState['+'] ) {
-        camera->moveUp(0.01);
+        camera->moveUp(0.03);
     }
 
     if( keyState['a'] ) {
         // strafe camera left
-        camera->moveLeft(0.01);
+        camera->moveLeft(0.03);
     } else if( keyState['e'] ) {
         // strafe camera right
-        camera->moveRight(0.01);
+        camera->moveRight(0.03);
     }
 
     if( specialKeyState[GLUT_KEY_LEFT] ) {
         // rotate camera to the left
-        camera->pointLeft(0.01);
+        camera->pointLeft(0.03);
     } else if( specialKeyState[GLUT_KEY_RIGHT] ) {
         // rotate camera to the right
-        camera->pointRight(0.01);
+        camera->pointRight(0.03);
     }
 
     if( specialKeyState[GLUT_KEY_UP] ) {
         // rotate camera up
-        camera->pointUp(0.01);
+        camera->pointUp(0.03);
     } else if( specialKeyState[GLUT_KEY_DOWN] ) {
         // rotate camera down
-        camera->pointDown(0.01);
+        camera->pointDown(0.03);
     }
     
     glutPostRedisplay();

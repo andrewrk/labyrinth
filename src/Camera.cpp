@@ -83,13 +83,14 @@ void Camera::moveBackward(float distance) {
 void Camera::rotateVecAboutVec(Vec3<float> & vec,
     const Vec3<float> & aboutVec, float angle)
 {
+    Vec3<float> normAbout = aboutVec.normalized();
     Matrix33<float> I;
     Matrix33<float> L(
-        0, aboutVec.z, -aboutVec.y,
-        -aboutVec.z, 0, aboutVec.x,
-        aboutVec.y, -aboutVec.x, 0
+        0, normAbout.z, -normAbout.y,
+        -normAbout.z, 0, normAbout.x,
+        normAbout.y, -normAbout.x, 0
     );
-    float d = aboutVec.length();
+    float d = normAbout.length();
     vec *= ( I + (sin(angle)/d) * L + (((1 - cos(angle))/(d*d)) * (L * L) ));
 }
 

@@ -19,10 +19,12 @@ class MazeView {
         void display();
 
     private:
+
         const Maze & m_maze;
         const Vec3<float> & m_pos;
         const Vec3<float> & m_size;
         Vec3<float> m_sectorSize;
+        Vec3<float> m_wallSize;
 };
 
 #endif

@@ -31,7 +31,7 @@ bool specialKeyState[256] = {0};
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
 
-    glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE);
+    glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(800, 600);
     glutCreateWindow("Labyrinth");
 
@@ -55,31 +55,31 @@ void init() {
     // initialize opengl
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glShadeModel(GL_FLAT);
-
     glutIgnoreKeyRepeat(true);
 
     // initialize program
     // create maze object
     maze = new Maze(10, 10);
-    mazeView = new MazeView(*maze, Vec3<float>(0, 0, 0), Vec3<float>(1,1,0.5));
+    mazeView = new MazeView(*maze, Vec3<float>(0, 0, 0), Vec3<float>(20,20,1));
 
     // create camera
-    camera = new Camera(Vec3<float>(0, 0, 0.6),
+    camera = new Camera(Vec3<float>(0, 0, 0.5),
         Vec3<float>(0,0,1),
-        Vec3<float>(1,1,-0.3));
+        Vec3<float>(1,1,0));
 
 }
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
-    
-    glPushMatrix();
 
+    // Build Camera
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
     camera->applyTransformations();
+
+    // Transform and Render Objects
     mazeView->display();
-
-    glPopMatrix();
-
+    
     glutSwapBuffers();
 }
 
@@ -148,11 +148,12 @@ void nextFrame() {
 
 void reshape(GLint w, GLint h) {
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+
+    // build projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, 1, 0, 1, 0, 1);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    gluPerspective(80, 1.33, 0.01, 100);
+
 }
 
 void mouse(GLint button, GLint action, GLint x, GLint y) {

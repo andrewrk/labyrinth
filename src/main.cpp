@@ -64,10 +64,11 @@ void init() {
     // initialize program
     // create maze object
     maze = new Maze(10, 10);
-    mazeView = new MazeView(*maze, Vec3<float>(0, 0, 0), Vec3<float>(20,20,1));
+    mazeView = new MazeView(*maze, Vec3<float>(0, 0, 0),
+        Vec3<float>(200,200,10));
 
     // create camera
-    camera = new Camera(Vec3<float>(1, 1, 0.5),
+    camera = new Camera(Vec3<float>(10, 10, 1),
         Vec3<float>(0,0,1),
         Vec3<float>(1,-1,0));
 
@@ -111,24 +112,24 @@ void specialKeyUp(int key, int x, int y) {
 void nextFrame() {
     if( keyState[','] ) {
         // move camera forward in the direction it is facing
-        camera->moveForward(0.03);
+        camera->moveForward(0.3);
     } else if( keyState['o'] ) {
         // move camera backward in the direction it is facing
-        camera->moveBackward(0.03);
+        camera->moveBackward(0.3);
     }
 
     if( keyState['-'] ) {
-        camera->moveDown(0.03);
+        camera->moveDown(0.3);
     } else if( keyState['+'] ) {
-        camera->moveUp(0.03);
+        camera->moveUp(0.3);
     }
 
     if( keyState['a'] ) {
         // strafe camera left
-        camera->moveLeft(0.03);
+        camera->moveLeft(0.3);
     } else if( keyState['e'] ) {
         // strafe camera right
-        camera->moveRight(0.03);
+        camera->moveRight(0.3);
     }
 
     if( specialKeyState[GLUT_KEY_LEFT] ) {
@@ -158,7 +159,7 @@ void reshape(GLint w, GLint h) {
     // build projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(80, (float)formWidth / (float)formHeight, 0.01, 100);
+    gluPerspective(80, (float)formWidth / (float)formHeight, 1, 1000);
 }
 
 void mouse(GLint button, GLint action, GLint x, GLint y) {

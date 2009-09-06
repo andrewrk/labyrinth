@@ -13,12 +13,16 @@ int main(int argc, char *argv[]);
 void init();
 void reshape(GLint w, GLint h);
 void mouse(GLint button, GLint action, GLint x, GLint y);
+void entry(int state);
+void motion(int x, int y);
 void keyDown(unsigned char key, int x, int y);
 void keyUp(unsigned char key, int x, int y);
 void specialKeyDown(int key, int x, int y);
 void specialKeyUp(int key, int x, int y);
 void display();
 void nextFrame();
+void activateWindow();
+void deactivateWindow();
 
 Maze * maze;
 MazeView * mazeView;
@@ -28,6 +32,8 @@ bool keyState[256] = {0};
 bool specialKeyState[256] = {0};
 
 int formWidth = 800, formHeight = 600;
+
+bool outsideWindow = true;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -40,6 +46,7 @@ int main(int argc, char *argv[]) {
 
     glutDisplayFunc(display);
     glutMouseFunc(mouse);
+    glutEntryFunc(entry);
     glutReshapeFunc(reshape);
     glutIdleFunc(nextFrame);
     glutKeyboardFunc(keyDown);
@@ -55,11 +62,13 @@ void init() {
     // initialize opengl
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glShadeModel(GL_FLAT);
-    glutIgnoreKeyRepeat(true);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CCW);
+
+    glutSetCursor(GLUT_CURSOR_NONE);
+    glutIgnoreKeyRepeat(true);
 
     // initialize program
     // create maze object
@@ -131,22 +140,6 @@ void nextFrame() {
         // strafe camera right
         camera->moveRight(0.3);
     }
-
-    if( specialKeyState[GLUT_KEY_LEFT] ) {
-        // rotate camera to the left
-        camera->pointLeft(0.03);
-    } else if( specialKeyState[GLUT_KEY_RIGHT] ) {
-        // rotate camera to the right
-        camera->pointRight(0.03);
-    }
-
-    if( specialKeyState[GLUT_KEY_UP] ) {
-        // rotate camera up
-        camera->pointUp(0.03);
-    } else if( specialKeyState[GLUT_KEY_DOWN] ) {
-        // rotate camera down
-        camera->pointDown(0.03);
-    }
     
     glutPostRedisplay();
 }
@@ -163,6 +156,11 @@ void reshape(GLint w, GLint h) {
 }
 
 void mouse(GLint button, GLint action, GLint x, GLint y) {
+    if( outsideWindow ){
+        activateWindow();
+        return;
+    }
+
     switch(button){
         case GLUT_LEFT_BUTTON:
             if( action == GLUT_DOWN )
@@ -183,5 +181,35 @@ void mouse(GLint button, GLint action, GLint x, GLint y) {
                 cout << "middle up" << endl;
             break;
     }
+}
+
+void motion(int x, int y) {
+    int centerX = formWidth / 2, centerY = formHeight /2;
+    float deltaX = x-centerX, deltaY = y-centerY;
+
+    if( x != centerX || y != centerY) {
+        glutWarpPointer(centerX, centerY);
+
+        camera->pointRight(deltaX/500);
+        camera->pointDown(deltaY/500);
+    }
+}
+
+void entry(int state) {
+    if( state == GLUT_LEFT )
+        deactivateWindow();
+}
+
+void activateWindow() {
+    outsideWindow = false;
+    glutMotionFunc(motion);
+    glutPassiveMotionFunc(motion);
+    glutWarpPointer(formWidth / 2, formHeight / 2);
+}
+
+void deactivateWindow() {
+    outsideWindow = true;
+    glutMotionFunc(NULL);
+    glutPassiveMotionFunc(NULL);
 }
 

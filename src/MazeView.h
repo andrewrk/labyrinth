@@ -1,12 +1,16 @@
+// MazeView - renders a maze in 3d with OpenGL
+
 #ifndef _MAZE_VIEW_H_
 #define _MAZE_VIEW_H_
 
 #include "Maze.h"
+#include "Drawable.h"
 
 #include "ImathVec.h"
 using namespace Imath;
 
-class MazeView {
+
+class MazeView : public Drawable {
     public:
         // size.x - x component of the 2d maze
         // size.y - y compenent of the 2d maze
@@ -15,8 +19,9 @@ class MazeView {
             const Vec3<float> &size);
         ~MazeView();
 
+    protected:
         // render with opengl
-        void display();
+        void render();
 
     private:
 

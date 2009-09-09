@@ -1,13 +1,14 @@
 Version 0.1.0 (Project 1)
 * mesh data structure
 * load .obj files from disk and render them
-* gl lists
+* compile for windows
 * fix posts
+* make posts cylinders
 * control panel viewport
     - text displayed in the control panel
     - elapsed time in the control panel
+    - frame rate display
 * popup menu
-* make posts cylinders
 * indicate start area
 * indicate finish area
 * configurable keys

@@ -75,6 +75,7 @@ void init() {
     maze = new Maze(10, 10);
     mazeView = new MazeView(*maze, Vec3<float>(0, 0, 0),
         Vec3<float>(200,200,10));
+    mazeView->init();
 
     // create camera
     camera = new Camera(Vec3<float>(10, 10, 1),
@@ -92,7 +93,7 @@ void display() {
     camera->applyTransformations();
 
     // Transform and Render Objects
-    mazeView->display();
+    mazeView->draw();
     
     glutSwapBuffers();
 }

@@ -1,5 +1,8 @@
 #include "MazeView.h"
 
+#include <iostream>
+using namespace std;
+
 #include "GL/glut.h"
 
 MazeView::MazeView(const Maze &maze, const Vec3<float> &pos,
@@ -22,9 +25,8 @@ MazeView::~MazeView() {
     
 }
 
-void MazeView::display() {
-    // display the floor
-
+void MazeView::render() {
+    cout << "render called" << endl;
     // display each wall
     for(int x=0; x<m_maze.width(); ++x) {
         for(int y=0; y<m_maze.height(); ++y) {
@@ -66,10 +68,10 @@ void MazeView::display() {
             }
 
             // place a post
-            if( y > 0 && m_maze.cellHasWall(x,y-1,Maze::West) ||
-                y > 0 && (m_maze.cellHasWall(x,y-1,Maze::South)) ||
+            if( (y > 0 && m_maze.cellHasWall(x,y-1,Maze::West)    ) ||
+                (y > 0 && (m_maze.cellHasWall(x,y-1,Maze::South)) ) ||
                 (m_maze.cellHasWall(x,y,Maze::West)) ||
-                y > 0 && (m_maze.cellHasWall(x-1,y-1,Maze::South)))
+                (y > 0 && (m_maze.cellHasWall(x-1,y-1,Maze::South))))
             {
                 glColor3f(0.59, 0.65, 0.74);
                 renderPost(loc);

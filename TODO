@@ -1,2 +1,43 @@
+Version 0.1.0 (Project 1)
+* mesh data structure
+* load .obj files from disk and render them
+* gl lists
+* fix posts
+* control panel viewport
+    - text displayed in the control panel
+    - elapsed time in the control panel
+* popup menu
+* make posts cylinders
+* indicate start area
+* indicate finish area
+* configurable keys
 * gravity
-* use mouse to rotate camera
+* person rotating around a person which rotates around a mailbox
+* object rotating around another one without rotating itself
+* top-down map view which can be toggled with popup menu
+* menu option for switch between shading - flat and shading - smooth
+* menu option for switch between using display lists and intermediate mode
+* collision detection - can't go through walls
+    - menu option for turning it on and off
+
+Version 0.2.0 (Project 2)
+* texturing
+* lighting
+* use 3 different textures
+* options:
+    * texturing on and off
+    * texture - replace and texture - blend
+    * minification - simple, smooth
+    * magnification - simple, smooth
+<there is more, check the doc>
+
+Ideas:
+* add a person as the character and add 3rd person view
+* minotaur
+* network play
+* jet pack
+
+Completed:
+* basic opengl program with double buffering
+* add dependency on OpenEXR vector library
+* reshape window handled gracefully

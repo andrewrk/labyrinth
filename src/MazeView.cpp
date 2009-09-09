@@ -66,32 +66,15 @@ void MazeView::display() {
             }
 
             // place a post
-            if( m_maze.cellHasWall(x,y-1,Maze::West) ||
-                (m_maze.cellHasWall(x,y-1,Maze::South)) ||
+            if( y > 0 && m_maze.cellHasWall(x,y-1,Maze::West) ||
+                y > 0 && (m_maze.cellHasWall(x,y-1,Maze::South)) ||
                 (m_maze.cellHasWall(x,y,Maze::West)) ||
-                (m_maze.cellHasWall(x-1,y-1,Maze::South)))
+                y > 0 && (m_maze.cellHasWall(x-1,y-1,Maze::South)))
             {
                 glColor3f(0.59, 0.65, 0.74);
                 renderPost(loc);
             }
         }
-        int x = m_maze.width();
-        for(int y=0; y<m_maze.height(); ++y) {
-            Vec3<float> loc(
-                m_pos.x + ((float)x) * m_sectorSize.x,
-                m_pos.y + ((float)y) * m_sectorSize.y, 0);
-            glColor3f(0.59, 0.65, 0.74);
-            renderPost(loc);
-        }
-        int y = m_maze.height();
-        for(int x=0; x<m_maze.width(); ++x) {
-            Vec3<float> loc(
-                m_pos.x + ((float)x) * m_sectorSize.x,
-                m_pos.y + ((float)y) * m_sectorSize.y, 0);
-            glColor3f(0.59, 0.65, 0.74);
-            renderPost(loc);
-        }
-
     }
 }
 

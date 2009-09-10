@@ -19,10 +19,48 @@ MazeView::MazeView(const Maze &maze, const Vec3<float> &pos,
     m_postSize.y = m_sectorSize.x / 10;
     m_postSize.z = m_sectorSize.z * 1.2;
 
+    createPosts();
 }
 
 MazeView::~MazeView() {
     
+}
+
+Vec3<float> MazeView::getCornerLoc(int x, int y){
+    return Vec3<float>(
+        m_pos.x + ((float)x) * m_sectorSize.x,
+        m_pos.y + ((float)y) * m_sectorSize.y, 0);
+}
+
+void MazeView::createPosts() {
+    m_posts.clear();
+    int x,y;
+    Vec3<float> loc;
+    for(x=0; x<m_maze.width(); ++x) {
+        for(y=0; y<=m_maze.height(); ++y) {
+            if( (y > 0 && m_maze.cellHasWall(x,y-1,Maze::West)    ) ||
+                (y > 0 && (m_maze.cellHasWall(x,y-1,Maze::South)) ) ||
+                (y < m_maze.height() && m_maze.cellHasWall(x,y,Maze::West)) ||
+                (x > 0 && y > 0 && (m_maze.cellHasWall(x-1,y-1,Maze::South))))
+            {
+                m_posts.push_back(getCornerLoc(x,y));
+            }
+        }
+        y = 0;
+        if( m_maze.cellHasWall(x,y,Maze::North) ||
+            (x > 0 && (m_maze.cellHasWall(x-1,y,Maze::South))) )
+        {
+            m_posts.push_back(getCornerLoc(x,y));
+        }
+    }
+    x = m_maze.width()-1;
+    for(y=0; y<=m_maze.height(); ++y){
+        if( (y > 0 && m_maze.cellHasWall(x,y-1,Maze::East)) ||
+            (y < m_maze.height() && m_maze.cellHasWall(x,y,Maze::East)) )
+        {
+            m_posts.push_back(getCornerLoc(x+1,y));
+        }
+    }
 }
 
 void MazeView::render() {
@@ -65,18 +103,13 @@ void MazeView::render() {
                 glColor3f(0.4, 0.4, 0.1);
                 vertWall(loc);
             }
-
-            // place a post
-            if( (y > 0 && m_maze.cellHasWall(x,y-1,Maze::West)    ) ||
-                (y > 0 && (m_maze.cellHasWall(x,y-1,Maze::South)) ) ||
-                (m_maze.cellHasWall(x,y,Maze::West)) ||
-                (y > 0 && (m_maze.cellHasWall(x-1,y-1,Maze::South))))
-            {
-                glColor3f(0.59, 0.65, 0.74);
-                renderPost(loc);
-            }
         }
     }
+
+    // render posts
+    glColor3f(0.59, 0.65, 0.74);
+    for(unsigned int i=0; i<m_posts.size(); ++i)
+        renderPost(m_posts[i]);
 }
 
 void MazeView::cuboid(Vec3<float> basePt1, Vec3<float> basePt2,

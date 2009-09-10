@@ -1,5 +1,4 @@
 Version 0.1.0 (Project 1)
-* fix posts
 * make posts cylinders
 * mesh data structure
 * load .obj files from disk and render them
@@ -15,6 +14,8 @@ Version 0.1.0 (Project 1)
 * top-down map view which can be toggled with popup menu
 * collision detection - can't go through walls
     - menu option for turning it on and off
+* bug: when you look all the way down or all the way up with Camera, it flips
+  the view
 
 Version 0.2.0 (Project 2)
 * texturing

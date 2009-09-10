@@ -6,6 +6,9 @@
 #include "Maze.h"
 #include "Drawable.h"
 
+#include <vector>
+using namespace std;
+
 #include "ImathVec.h"
 using namespace Imath;
 
@@ -30,6 +33,7 @@ class MazeView : public Drawable {
         const Vec3<float> & m_size;
         Vec3<float> m_sectorSize;
         Vec3<float> m_postSize;
+        vector< Vec3<float> > m_posts;
 
         void cuboid(Vec3<float> basePt1, Vec3<float> basePt2,
             Vec3<float> basePt3, Vec3<float> basePt4, float height);
@@ -37,6 +41,9 @@ class MazeView : public Drawable {
         void vertWall(Vec3<float> loc);
         void horizWall(Vec3<float> loc);
         void renderPost(Vec3<float> loc);
+        Vec3<float> getCornerLoc(int x, int y);
+        void createPosts();
+
 };
 
 #endif

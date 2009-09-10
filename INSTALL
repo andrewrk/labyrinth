@@ -1,4 +1,12 @@
-Recommended out of tree build:
+= Linux =
+== Dependencies ==
+
+cmake 2.6
+freeglut
+opengl
+ilmbase
+
+== Build instructions ==
 
 mkdir build
 cd build
@@ -6,4 +14,27 @@ cmake ../
 make
 make install
 
+= Windows =
 
+You can build labyrinth for windows on linux by using the windows toolchain.
+But first you need to set up your mingw32 environment, which can be complex.
+See the mingw site for documentation.
+
+== Environment ==
+
+You need these packages installed into your mingw32 environment, which means
+copying the respective include, lib, and bin files to your environment.
+
+opengl
+freeglut
+ilmbase
+
+== Build instructions ==
+
+mkdir win32-build
+cd win32-build
+cmake ../ -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-mingw32.cmake
+
+= Building on windows =
+
+Building on windows is not supported.

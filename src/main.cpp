@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+#include <cstdlib>
 using namespace std;
 
 #include "GL/freeglut.h"
@@ -9,6 +10,13 @@ using namespace Imath;
 #include "Maze.h"
 #include "MazeView.h"
 #include "Camera.h"
+
+enum MenuItem {
+    MenuUseGlLists,
+        MenuUseGlListsOn,
+        MenuUseGlListsOff,
+    MenuQuit
+};
 
 int main(int argc, char *argv[]);
 void init();
@@ -24,6 +32,10 @@ void display();
 void nextFrame();
 void activateWindow();
 void deactivateWindow();
+void setListRendering(bool value);
+
+void menu(int value);
+void initMenus();
 
 Maze * maze;
 MazeView * mazeView;
@@ -39,6 +51,9 @@ bool outsideWindow = true;
 clock_t prevTicks = 0;
 int numFramesDrawn = 0;
 int fps = 0;
+
+int menuId;
+int menuUseGlListsId;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -75,6 +90,9 @@ void init() {
     glutSetCursor(GLUT_CURSOR_NONE);
     glutIgnoreKeyRepeat(true);
 
+    // initialize menus
+    initMenus();
+
     // initialize program
     // create maze object
     maze = new Maze(10, 10);
@@ -87,6 +105,39 @@ void init() {
         Vec3<float>(0,0,1),
         Vec3<float>(1,-1,0));
 
+}
+
+void initMenus() {
+    menuUseGlListsId = glutCreateMenu(menu);
+    glutAddMenuEntry("On", MenuUseGlListsOn);
+    glutAddMenuEntry("Off", MenuUseGlListsOff);
+
+    glutSetMenu(menuId);
+
+    menuId = glutCreateMenu(menu);
+    glutAddSubMenu("Use glLists", menuUseGlListsId);
+    glutAddMenuEntry("Quit", MenuQuit);
+
+
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+void setListRendering(bool value){
+    mazeView->setListRendering(value);
+}
+
+void menu(int value) {
+    switch(value){
+        case MenuUseGlListsOn:
+            setListRendering(true);
+            break;
+        case MenuUseGlListsOff:
+            setListRendering(false);
+            break;
+        case MenuQuit:
+            exit(0);
+            break;
+    }
 }
 
 void display() {
@@ -205,10 +256,9 @@ void mouse(GLint button, GLint action, GLint x, GLint y) {
                 cout << "left up" << endl;
             break;
         case GLUT_RIGHT_BUTTON:
-            if( action == GLUT_DOWN )
-                cout << "right down" << endl;
-            else
-                cout << "right up" << endl;
+            if( action == GLUT_DOWN ) {
+                // pop a menu
+            }
             break;
         case GLUT_MIDDLE_BUTTON:
             if( action == GLUT_DOWN )
@@ -248,4 +298,3 @@ void deactivateWindow() {
     glutMotionFunc(NULL);
     glutPassiveMotionFunc(NULL);
 }
-

@@ -11,6 +11,8 @@ using namespace Imath;
 #include "MazeView.h"
 #include "Camera.h"
 
+#include "version.h"
+
 enum MenuItem {
     MenuUseGlLists,
         MenuUseGlListsOn,
@@ -83,6 +85,9 @@ int main(int argc, char *argv[]) {
 }
 
 void init() {
+    // output version
+    cout << "Version: " << VERSION_STRING << endl;
+
     // initialize opengl
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glShadeModel(GL_SMOOTH);

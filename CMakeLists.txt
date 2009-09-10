@@ -13,10 +13,6 @@ IF(EXISTS ${CMAKE_SOURCE_DIR}/.svn)
     INCLUDE(FindSubversion)
     IF(Subversion_FOUND)
         EXECUTE_PROCESS(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            COMMAND ${Subversion_SVN_EXECUTABLE} info --depth infinity
-            COMMAND grep "^Revision:"
-            OUTPUT_VARIABLE SVN_REV)
-        EXECUTE_PROCESS(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMAND ${Subversion_SVN_EXECUTABLE} info
             COMMAND grep "^Revision:"
             OUTPUT_VARIABLE SVN_REV)

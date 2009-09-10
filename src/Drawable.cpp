@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-#include "GL/glut.h"
+#include "GL/freeglut.h"
 
 Drawable::Drawable() :
     m_useListRendering(true)

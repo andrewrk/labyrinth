@@ -1,7 +1,8 @@
 #include <iostream>
+#include <ctime>
 using namespace std;
 
-#include "GL/glut.h"
+#include "GL/freeglut.h"
 #include "ImathVec.h"
 using namespace Imath;
 
@@ -34,6 +35,10 @@ bool specialKeyState[256] = {0};
 int formWidth = 800, formHeight = 600;
 
 bool outsideWindow = true;
+
+clock_t prevTicks = 0;
+int numFramesDrawn = 0;
+int fps = 0;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -87,6 +92,11 @@ void init() {
 void display() {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+    // build projection
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(80, (float)formWidth / (float)formHeight, 1, 1000);
+
     // Build Camera
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -94,7 +104,36 @@ void display() {
 
     // Transform and Render Objects
     mazeView->draw();
+
+    // control panel
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, formWidth, formHeight, 0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    // fps counter
+    clock_t nowTicks = clock();
+    clock_t delta = nowTicks - prevTicks;
+    if( delta >= CLOCKS_PER_SEC ) {
+        delta -= CLOCKS_PER_SEC;
+        prevTicks = clock() - delta;
+        prevTicks = nowTicks;
+        fps = numFramesDrawn;
+        numFramesDrawn = 0;
+    }
+    ++numFramesDrawn;
+
+    stringstream ss;
+    ss << fps << " fps";
     
+    glColor3f(0, 0, 0);
+    glRasterPos2f(20, formHeight - 20);
+    glutBitmapString(GLUT_BITMAP_9_BY_15, (const unsigned char *) ss.str().c_str());
+
+
+    // animate
     glutSwapBuffers();
 }
 
@@ -150,10 +189,6 @@ void reshape(GLint w, GLint h) {
     formHeight = h;
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 
-    // build projection
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(80, (float)formWidth / (float)formHeight, 1, 1000);
 }
 
 void mouse(GLint button, GLint action, GLint x, GLint y) {

@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-#include "GL/glut.h"
+#include "GL/freeglut.h"
 
 MazeView::MazeView(const Maze &maze, const Vec3<float> &pos,
         const Vec3<float> & size) :
@@ -26,7 +26,6 @@ MazeView::~MazeView() {
 }
 
 void MazeView::render() {
-    cout << "render called" << endl;
     // display each wall
     for(int x=0; x<m_maze.width(); ++x) {
         for(int y=0; y<m_maze.height(); ++y) {

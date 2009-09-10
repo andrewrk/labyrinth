@@ -1,13 +1,12 @@
 Version 0.1.0 (Project 1)
+* control panel viewport
+    - text displayed in the control panel
+    - elapsed time in the control panel
 * mesh data structure
 * load .obj files from disk and render them
 * compile for windows
 * fix posts
 * make posts cylinders
-* control panel viewport
-    - text displayed in the control panel
-    - elapsed time in the control panel
-    - frame rate display
 * popup menu
 * indicate start area
 * indicate finish area

@@ -14,7 +14,6 @@ Version 0.1.0 (Project 1)
 * person rotating around a person which rotates around a mailbox
 * object rotating around another one without rotating itself
 * top-down map view which can be toggled with popup menu
-* menu option for switch between shading - flat and shading - smooth
 * collision detection - can't go through walls
     - menu option for turning it on and off
 

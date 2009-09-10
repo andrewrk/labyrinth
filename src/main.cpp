@@ -15,6 +15,9 @@ enum MenuItem {
     MenuUseGlLists,
         MenuUseGlListsOn,
         MenuUseGlListsOff,
+    MenuShadeModel,
+        MenuShadeModelSmooth,
+        MenuShadeModelFlat,
     MenuQuit
 };
 
@@ -54,6 +57,7 @@ int fps = 0;
 
 int menuId;
 int menuUseGlListsId;
+int menuShadeModelId;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -81,7 +85,7 @@ int main(int argc, char *argv[]) {
 void init() {
     // initialize opengl
     glClearColor(0.0, 0.0, 0.0, 0.0);
-    glShadeModel(GL_FLAT);
+    glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
@@ -112,10 +116,13 @@ void initMenus() {
     glutAddMenuEntry("On", MenuUseGlListsOn);
     glutAddMenuEntry("Off", MenuUseGlListsOff);
 
-    glutSetMenu(menuId);
+    menuShadeModelId = glutCreateMenu(menu);
+    glutAddMenuEntry("Smooth", MenuShadeModelSmooth);
+    glutAddMenuEntry("Flat", MenuShadeModelFlat);
 
     menuId = glutCreateMenu(menu);
     glutAddSubMenu("Use glLists", menuUseGlListsId);
+    glutAddSubMenu("Shade model", menuShadeModelId);
     glutAddMenuEntry("Quit", MenuQuit);
 
 
@@ -133,6 +140,12 @@ void menu(int value) {
             break;
         case MenuUseGlListsOff:
             setListRendering(false);
+            break;
+        case MenuShadeModelSmooth:
+            glShadeModel(GL_SMOOTH);
+            break;
+        case MenuShadeModelFlat:
+            glShadeModel(GL_FLAT);
             break;
         case MenuQuit:
             exit(0);
@@ -256,9 +269,10 @@ void mouse(GLint button, GLint action, GLint x, GLint y) {
                 cout << "left up" << endl;
             break;
         case GLUT_RIGHT_BUTTON:
-            if( action == GLUT_DOWN ) {
-                // pop a menu
-            }
+            if( action == GLUT_DOWN )
+                    cout << "right down" << endl;
+                else
+                    cout << "right up" << endl;
             break;
         case GLUT_MIDDLE_BUTTON:
             if( action == GLUT_DOWN )

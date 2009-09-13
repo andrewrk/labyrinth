@@ -87,6 +87,7 @@ int main(int argc, char *argv[]) {
 void init() {
     // output version
     cout << "Version: " << VERSION_STRING << endl;
+    cout << "clocks per second: " << CLOCKS_PER_SEC << endl;
 
     // initialize opengl
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -187,8 +188,7 @@ void display() {
     clock_t delta = nowTicks - prevTicks;
     if( delta >= CLOCKS_PER_SEC ) {
         delta -= CLOCKS_PER_SEC;
-        prevTicks = clock() - delta;
-        prevTicks = nowTicks;
+        prevTicks = nowTicks - delta;
         fps = numFramesDrawn;
         numFramesDrawn = 0;
     }

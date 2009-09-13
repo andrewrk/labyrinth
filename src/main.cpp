@@ -38,6 +38,7 @@ void nextFrame(int value);
 void activateWindow();
 void deactivateWindow();
 void setListRendering(bool value);
+void quitApp();
 
 void menu(int value);
 void initMenus();
@@ -156,9 +157,17 @@ void menu(int value) {
             glShadeModel(GL_FLAT);
             break;
         case MenuQuit:
-            exit(0);
+            quitApp();
             break;
     }
+}
+
+void quitApp() {
+    if( maze ) delete maze;
+    if( mazeView ) delete mazeView;
+    if( camera ) delete camera;
+
+    exit(0);
 }
 
 void display() {
@@ -223,6 +232,14 @@ void keyUp(unsigned char key, int x, int y) {
 
 void specialKeyDown(int key, int x, int y) {
     specialKeyState[key] = true;
+
+    // check for alt+f4
+    switch(key){
+        case GLUT_KEY_F4:
+            if( glutGetModifiers() & GLUT_ACTIVE_ALT )
+                quitApp();
+            break;
+    }
 }
 
 void specialKeyUp(int key, int x, int y) {

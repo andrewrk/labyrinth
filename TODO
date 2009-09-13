@@ -1,14 +1,13 @@
 Version 0.1.0 (Project 1)
+* configurable keys
 * make posts cylinders
 * mesh data structure
 * load .obj files from disk and render them
 * control panel viewport
     - text displayed in the control panel
     - elapsed time in the control panel
-* fix frame rate issues
 * indicate start area
 * indicate finish area
-* configurable keys
 * gravity
 * person rotating around a person which rotates around a mailbox
 * object rotating around another one without rotating itself

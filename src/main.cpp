@@ -34,7 +34,7 @@ void keyUp(unsigned char key, int x, int y);
 void specialKeyDown(int key, int x, int y);
 void specialKeyUp(int key, int x, int y);
 void display();
-void nextFrame();
+void nextFrame(int value);
 void activateWindow();
 void deactivateWindow();
 void setListRendering(bool value);
@@ -61,6 +61,9 @@ int menuId;
 int menuUseGlListsId;
 int menuShadeModelId;
 
+// milliseconds in between frames 
+const int frameDelay = 17;
+
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
 
@@ -74,7 +77,7 @@ int main(int argc, char *argv[]) {
     glutMouseFunc(mouse);
     glutEntryFunc(entry);
     glutReshapeFunc(reshape);
-    glutIdleFunc(nextFrame);
+    glutTimerFunc(frameDelay, nextFrame, 0);
     glutKeyboardFunc(keyDown);
     glutKeyboardUpFunc(keyUp);
     glutSpecialFunc(specialKeyDown);
@@ -87,7 +90,6 @@ int main(int argc, char *argv[]) {
 void init() {
     // output version
     cout << "Version: " << VERSION_STRING << endl;
-    cout << "clocks per second: " << CLOCKS_PER_SEC << endl;
 
     // initialize opengl
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -227,7 +229,9 @@ void specialKeyUp(int key, int x, int y) {
     specialKeyState[key] = false;
 }
 
-void nextFrame() {
+void nextFrame(int value) {
+    glutTimerFunc(frameDelay, nextFrame, 0);
+
     if( keyState[','] ) {
         // move camera forward in the direction it is facing
         camera->moveForward(0.3);

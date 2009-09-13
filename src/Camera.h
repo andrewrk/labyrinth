@@ -44,8 +44,8 @@ class Camera {
         // should be called when either m_pos or m_look changes
         inline void calcRefPoint() { m_refPoint = m_pos + m_look; }
 
-        void rotateVecAboutVec(Vec3<float> & vec,
-            const Vec3<float> & aboutVec, float angle);
+        static void rotateVector(Vec3<float> & vec,
+            const Vec3<float> & axis, float radians);
 };
 
 #endif

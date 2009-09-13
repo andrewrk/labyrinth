@@ -81,23 +81,23 @@ void Camera::moveBackward(float distance) {
     moveForward(-distance);
 }
 
-void Camera::rotateVecAboutVec(Vec3<float> & vec,
-    const Vec3<float> & aboutVec, float angle)
+void Camera::rotateVector(Vec3<float> & vec,
+    const Vec3<float> & axis, float radians)
 {
-    Vec3<float> normAbout = aboutVec.normalized();
+    Vec3<float> normAxis = axis.normalized();
     Matrix33<float> I;
     Matrix33<float> L(
-        0, normAbout.z, -normAbout.y,
-        -normAbout.z, 0, normAbout.x,
-        normAbout.y, -normAbout.x, 0
+        0, normAxis.z, -normAxis.y,
+        -normAxis.z, 0, normAxis.x,
+        normAxis.y, -normAxis.x, 0
     );
-    float d = normAbout.length();
-    vec *= ( I + (sin(angle)/d) * L + (((1 - cos(angle))/(d*d)) * (L * L) ));
+    float d = normAxis.length();
+    vec *= ( I + (sin(radians)/d) * L + (((1 - cos(radians))/(d*d)) * (L * L) ));
 }
 
 void Camera::pointLeft(float radians) {
     radians = fmodf(radians, 2*PI);
-    rotateVecAboutVec(m_look, Vec3<float>(0,0,1), radians);
+    rotateVector(m_look, Vec3<float>(0,0,1), radians);
     calcRefPoint();
 }
 
@@ -108,7 +108,7 @@ void Camera::pointRight(float radians) {
 void Camera::pointUp(float radians) {
     // rotate about left vector
     radians = fmodf(radians, 2*PI);
-    rotateVecAboutVec(m_look, m_look.cross(m_up), radians);
+    rotateVector(m_look, m_look.cross(m_up), radians);
     calcRefPoint();
 }
 

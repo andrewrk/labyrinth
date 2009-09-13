@@ -5,6 +5,7 @@ Version 0.1.0 (Project 1)
 * control panel viewport
     - text displayed in the control panel
     - elapsed time in the control panel
+* fix frame rate issues
 * indicate start area
 * indicate finish area
 * configurable keys

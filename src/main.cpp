@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
+#include <cctype>
 using namespace std;
 
 #include "GL/freeglut.h"
@@ -41,6 +42,7 @@ void activateWindow();
 void deactivateWindow();
 void setListRendering(bool value);
 void quitApp();
+unsigned char getKeyFor(unsigned char key);
 
 void menu(int value);
 void initMenus();
@@ -226,7 +228,7 @@ void display() {
 }
 
 void keyDown(unsigned char key, int x, int y) {
-    keyState[key] = true;
+    keyState[getKeyFor(key)] = true;
     switch(key){
         case 'p':
             maze->print();
@@ -235,7 +237,72 @@ void keyDown(unsigned char key, int x, int y) {
 }
 
 void keyUp(unsigned char key, int x, int y) {
-    keyState[key] = false;
+    keyState[getKeyFor(key)] = false;
+}
+
+unsigned char getKeyFor(unsigned char key) {
+    key = tolower(key);
+
+    switch(key){
+        case '~':
+            key = '`';
+            break;
+        case '!':
+            key = '1';
+            break;
+        case '@':
+            key = '2';
+            break;
+        case '#':
+            key = '3';
+            break;
+        case '$':
+            key = '4';
+            break;
+        case '%':
+            key = '5';
+            break;
+        case '^':
+            key = '6';
+            break;
+        case '&':
+            key = '7';
+            break;
+        case '*':
+            key = '8';
+            break;
+        case '(':
+            key = '9';
+            break;
+        case ')':
+            key = '0';
+            break;
+        case '{':
+            key = '[';
+            break;
+        case '}':
+            key = ']';
+            break;
+        case '?':
+            key = '/';
+            break;
+        case '+':
+            key = '=';
+            break;
+        case ':':
+            key = ';';
+            break;
+        case '_':
+            key = '-';
+            break;
+        case '"':
+            key = '\'';
+            break;
+        case '|':
+            key = '\\';
+    }
+
+    return key;
 }
 
 void specialKeyDown(int key, int x, int y) {
@@ -267,7 +334,7 @@ void nextFrame(int value) {
 
     if( keyState['-'] ) {
         camera->moveDown(0.3);
-    } else if( keyState['+'] ) {
+    } else if( keyState['='] ) {
         camera->moveUp(0.3);
     }
 

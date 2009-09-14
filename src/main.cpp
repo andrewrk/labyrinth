@@ -11,6 +11,8 @@ using namespace Imath;
 #include "MazeView.h"
 #include "Camera.h"
 
+#include "Config.h"
+
 #include "version.h"
 
 enum MenuItem {
@@ -46,6 +48,7 @@ void initMenus();
 Maze * maze;
 MazeView * mazeView;
 Camera * camera;
+Config * config;
 
 bool keyState[256] = {0};
 bool specialKeyState[256] = {0};
@@ -70,7 +73,7 @@ int main(int argc, char *argv[]) {
 
     glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(formWidth, formHeight);
-    glutCreateWindow("Labyrinth");
+    glutCreateWindow(PROGRAM_NAME);
 
     init();
 
@@ -118,6 +121,10 @@ void init() {
         Vec3<float>(0,0,1),
         Vec3<float>(1,-1,0));
 
+    // load configuration data
+    string rcfile = ".";
+    rcfile = rcfile + PROGRAM_NAME + "rc";
+    config = new Config(rcfile);
 }
 
 void initMenus() {
@@ -166,6 +173,7 @@ void quitApp() {
     if( maze ) delete maze;
     if( mazeView ) delete mazeView;
     if( camera ) delete camera;
+    if( config ) delete config;
 
     exit(0);
 }

@@ -1,5 +1,4 @@
 Version 0.1.0 (Project 1)
-* configurable keys
 * make posts cylinders
 * mesh data structure
 * load .obj files from disk and render them

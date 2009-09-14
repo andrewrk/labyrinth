@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <ctime>
 #include <cstdlib>
 #include <cctype>
@@ -8,11 +9,12 @@ using namespace std;
 #include "ImathVec.h"
 using namespace Imath;
 
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
+
 #include "Maze.h"
 #include "MazeView.h"
 #include "Camera.h"
-
-#include "Config.h"
 
 #include "version.h"
 
@@ -24,6 +26,16 @@ enum MenuItem {
         MenuShadeModelSmooth,
         MenuShadeModelFlat,
     MenuQuit
+};
+
+enum Actions {
+    ActionMoveForward,
+    ActionMoveBackward,
+    ActionStrafeLeft,
+    ActionStrafeRight,
+
+    // the length of the enum
+    NumActions
 };
 
 int main(int argc, char *argv[]);
@@ -50,7 +62,6 @@ void initMenus();
 Maze * maze;
 MazeView * mazeView;
 Camera * camera;
-Config * config;
 
 bool keyState[256] = {0};
 bool specialKeyState[256] = {0};
@@ -70,8 +81,51 @@ int menuShadeModelId;
 // milliseconds in between frames 
 const int frameDelay = 17;
 
+po::variables_map vm;
+
+unsigned char keyActions[NumActions];
+
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
+
+    // determine name of config file
+    string rcfile = ".";
+    rcfile = rcfile + PROGRAM_NAME + "rc";
+
+    // parse command line and config file
+    po::options_description cmdDesc("Allowed options");
+    cmdDesc.add_options()
+        ("help", "produce help message")
+    ;
+    po::options_description confDesc("Configuration file options");
+    confDesc.add_options()
+        ("keys.forward",
+            po::value<unsigned char>(
+                &keyActions[ActionMoveForward])->default_value('w'),
+            "key combo for moving forward")
+        ("keys.backward",
+            po::value<unsigned char>(
+                &keyActions[ActionMoveBackward])->default_value('s'),
+            "key combo for moving backward")
+        ("keys.strafeLeft",
+            po::value<unsigned char>(
+                &keyActions[ActionStrafeLeft])->default_value('a'),
+            "key combo for strafing left")
+        ("keys.strafeRight",
+            po::value<unsigned char>(
+                &keyActions[ActionStrafeRight])->default_value('d'),
+            "key combo for strafing right")
+    ;
+    cmdDesc.add(confDesc);
+    po::store(po::parse_command_line(argc, argv, cmdDesc), vm);
+    ifstream in(rcfile.c_str(), ifstream::in);
+    po::store(po::parse_config_file(in, cmdDesc), vm);
+    po::notify(vm);
+
+    if( vm.count("help") ){
+        cout << cmdDesc << endl;
+        return 1;
+    }
 
     glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(formWidth, formHeight);
@@ -105,7 +159,6 @@ void init() {
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CCW);
 
-    glutSetCursor(GLUT_CURSOR_NONE);
     glutIgnoreKeyRepeat(true);
 
     // initialize menus
@@ -123,10 +176,7 @@ void init() {
         Vec3<float>(0,0,1),
         Vec3<float>(1,-1,0));
 
-    // load configuration data
-    string rcfile = ".";
-    rcfile = rcfile + PROGRAM_NAME + "rc";
-    config = new Config(rcfile);
+    activateWindow();
 }
 
 void initMenus() {
@@ -175,7 +225,6 @@ void quitApp() {
     if( maze ) delete maze;
     if( mazeView ) delete mazeView;
     if( camera ) delete camera;
-    if( config ) delete config;
 
     exit(0);
 }
@@ -232,6 +281,9 @@ void keyDown(unsigned char key, int x, int y) {
     switch(key){
         case 'p':
             maze->print();
+            break;
+        case '\e': // escape
+            deactivateWindow();
             break;
     }
 }
@@ -300,6 +352,13 @@ unsigned char getKeyFor(unsigned char key) {
             break;
         case '|':
             key = '\\';
+            break;
+        case '<':
+            key = ',';
+            break;
+        case '>':
+            key = '.';
+            break;
     }
 
     return key;
@@ -324,24 +383,26 @@ void specialKeyUp(int key, int x, int y) {
 void nextFrame(int value) {
     glutTimerFunc(frameDelay, nextFrame, 0);
 
-    if( keyState[','] ) {
+    if( keyState[keyActions[ActionMoveForward]] &&
+        !keyState[keyActions[ActionMoveBackward]] )
+    {
         // move camera forward in the direction it is facing
         camera->moveForward(0.3);
-    } else if( keyState['o'] ) {
+    } else if( keyState[keyActions[ActionMoveBackward]] &&
+                !keyState[keyActions[ActionMoveForward]] )
+    {
         // move camera backward in the direction it is facing
         camera->moveBackward(0.3);
     }
 
-    if( keyState['-'] ) {
-        camera->moveDown(0.3);
-    } else if( keyState['='] ) {
-        camera->moveUp(0.3);
-    }
-
-    if( keyState['a'] ) {
+    if( keyState[keyActions[ActionStrafeLeft]] &&
+        !keyState[keyActions[ActionStrafeRight]] )
+    {
         // strafe camera left
         camera->moveLeft(0.3);
-    } else if( keyState['e'] ) {
+    } else if( keyState[keyActions[ActionStrafeRight]] &&
+                !keyState[keyActions[ActionStrafeLeft]] )
+    {
         // strafe camera right
         camera->moveRight(0.3);
     }
@@ -406,10 +467,12 @@ void activateWindow() {
     glutMotionFunc(motion);
     glutPassiveMotionFunc(motion);
     glutWarpPointer(formWidth / 2, formHeight / 2);
+    glutSetCursor(GLUT_CURSOR_NONE);
 }
 
 void deactivateWindow() {
     outsideWindow = true;
     glutMotionFunc(NULL);
     glutPassiveMotionFunc(NULL);
+    glutSetCursor(GLUT_CURSOR_RIGHT_ARROW);
 }

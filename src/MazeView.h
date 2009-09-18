@@ -37,6 +37,8 @@ class MazeView : public Drawable {
 
         void cuboid(Vec3<float> basePt1, Vec3<float> basePt2,
             Vec3<float> basePt3, Vec3<float> basePt4, float height);
+        void cylinder(Vec3<float> basePt, float radius, float height,
+            int numSides = 20);
 
         void vertWall(Vec3<float> loc);
         void horizWall(Vec3<float> loc);

@@ -5,6 +5,8 @@ using namespace std;
 
 #include "GL/freeglut.h"
 
+#define PI 3.14159265358979
+
 MazeView::MazeView(const Maze &maze, const Vec3<float> &pos,
         const Vec3<float> & size) :
     m_maze(maze),
@@ -112,6 +114,60 @@ void MazeView::render() {
         renderPost(m_posts[i]);
 }
 
+void MazeView::cylinder(Vec3<float> basePt, float radius, float height,
+    int numSides)
+{
+    float step = 2 * PI / (float) numSides;
+
+    // wrap
+    glBegin(GL_QUAD_STRIP);
+        for(int i = 0; i <= numSides; ++i ) {
+            float rad = i * step;
+            float x = radius * cos(rad);
+            float y = radius * sin(rad);
+
+            // top
+            glVertex3f(basePt.x+x, basePt.y+y, basePt.z+height);
+
+            // bottom
+            glVertex3f(basePt.x+x, basePt.y+y, basePt.z);
+        }
+    glEnd();
+
+    // put caps on it
+    // top
+    glBegin(GL_TRIANGLE_FAN);
+        // center point
+        glVertex3f(basePt.x, basePt.y, basePt.z+height);
+        
+        // outside
+        for(int i = 0; i <= numSides; ++i ) {
+            float rad = i * step;
+            float x = radius * cos(rad);
+            float y = radius * sin(rad);
+
+            glVertex3f(basePt.x+x, basePt.y+y, basePt.z+height);
+        }
+
+    glEnd();
+
+    // bottom
+    glBegin(GL_TRIANGLE_FAN);
+        // center point
+        glVertex3f(basePt.x, basePt.y, basePt.z);
+        
+        // outside
+        for(int i = numSides; i >= 0; --i ) {
+            float rad = i * step;
+            float x = radius * cos(rad);
+            float y = radius * sin(rad);
+
+            glVertex3f(basePt.x+x, basePt.y+y, basePt.z);
+        }
+    glEnd();
+    
+}
+
 void MazeView::cuboid(Vec3<float> basePt1, Vec3<float> basePt2,
     Vec3<float> basePt3, Vec3<float> basePt4, float height)
 {
@@ -165,10 +221,5 @@ void MazeView::vertWall(Vec3<float> loc) {
 }
 
 void MazeView::renderPost(Vec3<float> loc) {
-    cuboid(
-        loc+Vec3<float>(-m_postSize.x, m_postSize.y, 0),
-        loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
-        loc+Vec3<float>(m_postSize.x, -m_postSize.y, 0),
-        loc+Vec3<float>(-m_postSize.x, -m_postSize.y, 0),
-        m_postSize.z);
+    cylinder(loc, m_postSize.x, m_postSize.z);
 }

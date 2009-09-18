@@ -1,9 +1,7 @@
 Version 0.1.0 (Project 1)
-* make posts cylinders
 * mesh data structure
 * load .obj files from disk and render them
 * control panel viewport
-    - text displayed in the control panel
     - elapsed time in the control panel
 * indicate start area
 * indicate finish area
@@ -15,8 +13,10 @@ Version 0.1.0 (Project 1)
     - menu option for turning it on and off
 * bug: when you look all the way down or all the way up with Camera, it flips
   the view
+* deploy boost on windows
 
 Version 0.2.0 (Project 2)
+* use vertex buffer not glBegin() glEnd()
 * texturing
 * lighting
 * use 3 different textures

@@ -37,6 +37,14 @@ enum Actions {
     NumActions
 };
 
+enum MovementModes {
+    PlayMode,
+    SpecMode,
+
+    // length of the enum
+    NumGameStates
+};
+
 int main(int argc, char *argv[]);
 void init();
 void reshape(GLint w, GLint h);
@@ -88,8 +96,13 @@ int startX, startY;
 int finishX, finishY;
 int reqX, reqY;
 
+int moveMode;
+Vec3<float> playerPos;
+
 // clock() when the game starts
 clock_t startTime;
+
+float walkSpeed = 0.4f;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -183,10 +196,11 @@ void init() {
         Vec3<float>(200,200,10), startX, startY, finishX, finishY, reqX, reqY);
     mazeView->init();
 
+    moveMode = PlayMode;
+
     // create camera
-    camera = new Camera(Vec3<float>(10, 10, 1),
-        Vec3<float>(0,0,1),
-        Vec3<float>(1,-1,0));
+    playerPos = Vec3<float>(10, 10, 2);
+    camera = new Camera(playerPos, Vec3<float>(0,0,1), Vec3<float>(1,1,0));
 
     activateWindow();
 
@@ -317,6 +331,7 @@ void keyUp(unsigned char key, int x, int y) {
 }
 
 unsigned char getKeyFor(unsigned char key) {
+    // TODO: make this an array
     key = tolower(key);
 
     switch(key){
@@ -407,28 +422,64 @@ void specialKeyUp(int key, int x, int y) {
 void nextFrame(int value) {
     glutTimerFunc(frameDelay, nextFrame, 0);
 
-    if( keyState[keyActions[ActionMoveForward]] &&
-        !keyState[keyActions[ActionMoveBackward]] )
-    {
-        // move camera forward in the direction it is facing
-        camera->moveForward(0.3);
-    } else if( keyState[keyActions[ActionMoveBackward]] &&
-                !keyState[keyActions[ActionMoveForward]] )
-    {
-        // move camera backward in the direction it is facing
-        camera->moveBackward(0.3);
-    }
+    if( moveMode == PlayMode ) {
+        // move the player 
 
-    if( keyState[keyActions[ActionStrafeLeft]] &&
-        !keyState[keyActions[ActionStrafeRight]] )
-    {
-        // strafe camera left
-        camera->moveLeft(0.3);
-    } else if( keyState[keyActions[ActionStrafeRight]] &&
-                !keyState[keyActions[ActionStrafeLeft]] )
-    {
-        // strafe camera right
-        camera->moveRight(0.3);
+        if( keyState[keyActions[ActionMoveForward]] &&
+            !keyState[keyActions[ActionMoveBackward]] )
+        {
+            // walk forward
+            Vec3<float> walkDir = camera->look().normalized() * walkSpeed;
+            walkDir.z = 0;
+            playerPos += walkDir;
+        } else if( keyState[keyActions[ActionMoveBackward]] &&
+                    !keyState[keyActions[ActionMoveForward]] )
+        {
+            // walk backward
+            Vec3<float> walkDir = camera->look().normalized() * walkSpeed;
+            walkDir.z = 0;
+            playerPos -= walkDir;
+        }
+
+        if( keyState[keyActions[ActionStrafeLeft]] &&
+            !keyState[keyActions[ActionStrafeRight]] )
+        {
+            // strafe left
+            playerPos -= camera->look().cross(Vec3<float>(0, 0, 1)).normalize()
+                * walkSpeed;
+        } else if( keyState[keyActions[ActionStrafeRight]] &&
+                    !keyState[keyActions[ActionStrafeLeft]] )
+        {
+            // strafe right
+            playerPos += camera->look().cross(Vec3<float>(0, 0, 1)).normalize()
+                * walkSpeed;
+        }
+
+        camera->moveTo(playerPos);
+    } else if ( moveMode == SpecMode ) {
+        if( keyState[keyActions[ActionMoveForward]] &&
+            !keyState[keyActions[ActionMoveBackward]] )
+        {
+            // move camera forward in the direction it is facing
+            camera->moveForward(0.3);
+        } else if( keyState[keyActions[ActionMoveBackward]] &&
+                    !keyState[keyActions[ActionMoveForward]] )
+        {
+            // move camera backward in the direction it is facing
+            camera->moveBackward(0.3);
+        }
+
+        if( keyState[keyActions[ActionStrafeLeft]] &&
+            !keyState[keyActions[ActionStrafeRight]] )
+        {
+            // strafe camera left
+            camera->moveLeft(0.3);
+        } else if( keyState[keyActions[ActionStrafeRight]] &&
+                    !keyState[keyActions[ActionStrafeLeft]] )
+        {
+            // strafe camera right
+            camera->moveRight(0.3);
+        }
     }
     
     glutPostRedisplay();

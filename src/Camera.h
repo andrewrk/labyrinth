@@ -33,7 +33,10 @@ class Camera {
         void pointDown(float radians);
 
         // properties
-        const Vec3<float> & pos();
+        // position
+        const Vec3<float> & pos() const;
+        // where it is looking
+        const Vec3<float> & look() const;
     private:
         Vec3<float> m_pos;       
         Vec3<float> m_up;

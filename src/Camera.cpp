@@ -37,8 +37,12 @@ void Camera::moveTo(const Vec3<float> & newPos) {
     calcRefPoint();
 }
 
-const Vec3<float> & Camera::pos() {
+const Vec3<float> & Camera::pos() const {
     return m_pos;
+}
+
+const Vec3<float> & Camera::look() const {
+    return m_look;
 }
 
 void Camera::pointAt(const Vec3<float> & vec) {

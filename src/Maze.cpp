@@ -92,7 +92,7 @@ void Maze::generateMaze() {
                 neigh->wall[South] = false;
             } else if( curr->y < neigh->y ) {
                 curr->wall[South] = false;
-                neigh->wall[South] = false;
+                neigh->wall[North] = false;
             } else {
                 cerr << "error: generateMaze() neighbor equal to current"
                     << endl;

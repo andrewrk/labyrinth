@@ -16,13 +16,13 @@ class Mesh : public Drawable {
         ~Mesh();
 
     private:
-        vector< Vec3<float> > m_v; // array of vertices
-        vector< Vec3<float> > m_n; // array of normals
-        vector< Vec2<float> > m_texc; // array of 2d texture coordinates
+        vector< Vec3<float> > m_vertices;
+        vector< Vec3<float> > m_normals;
+        vector< Vec2<float> > m_textureCoords;
 
-        vector<int> m_vi; // vertex indices
-        vector<int> m_ni; // normal indices
-        vector<int> m_ti; // textcoord indices
+        vector<int> m_vertexIndices;
+        vector<int> m_normalIndices;
+        vector<int> m_textureCoordIndices;
 
 };
 

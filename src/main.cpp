@@ -166,7 +166,7 @@ void init() {
 
     // initialize program
     // create maze object
-    maze = new Maze(10, 10);
+    maze = new Maze(10, 10, 0, 0, 9, 9);
     mazeView = new MazeView(*maze, Vec3<float>(0, 0, 0),
         Vec3<float>(200,200,10));
     mazeView->init();

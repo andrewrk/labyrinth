@@ -1,24 +1,26 @@
 Version 0.1.0 (Project 1)
-* mesh data structure
-* load .obj files from disk and render them
+* fix maze
+* designate and indicate a start, finish, and requirements room
+* mesh data structure - load .obj files from disk and render them
+    - requirements room!
 * control panel viewport
     - elapsed time in the control panel
-* indicate start area
-* indicate finish area
 * gravity
 * person rotating around a person which rotates around a mailbox
 * object rotating around another one without rotating itself
 * top-down map view which can be toggled with popup menu
 * collision detection - can't go through walls
     - menu option for turning it on and off
+* fix deploy on windows
 * bug: when you look all the way down or all the way up with Camera, it flips
   the view
-* deploy boost on windows
 
 Version 0.2.0 (Project 2)
+* space combat simulator
 * use vertex buffer not glBegin() glEnd()
 * texturing
 * lighting
+* background scenery
 * use 3 different textures
 * options:
     * texturing on and off
@@ -26,9 +28,3 @@ Version 0.2.0 (Project 2)
     * minification - simple, smooth
     * magnification - simple, smooth
 <there is more, check the doc>
-
-Ideas:
-* add a person as the character and add 3rd person view
-* minotaur
-* network play
-* jet pack

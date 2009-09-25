@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <ctime>
 #include <cstdlib>
 #include <cctype>
 using namespace std;
@@ -88,6 +87,9 @@ unsigned char keyActions[NumActions];
 int startX, startY;
 int finishX, finishY;
 int reqX, reqY;
+
+// clock() when the game starts
+clock_t startTime;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -187,6 +189,9 @@ void init() {
         Vec3<float>(1,-1,0));
 
     activateWindow();
+
+
+    startTime = glutGet(GLUT_ELAPSED_TIME);
 }
 
 void initMenus() {
@@ -253,21 +258,23 @@ void display() {
     camera->applyTransformations();
 
     // Transform and Render Objects
+    glEnable(GL_DEPTH_TEST);
     mazeView->draw();
 
     // control panel
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0, formWidth, formHeight, 0);
+    glDisable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     // fps counter
-    clock_t nowTicks = clock();
+    clock_t nowTicks = glutGet(GLUT_ELAPSED_TIME);
     clock_t delta = nowTicks - prevTicks;
-    if( delta >= CLOCKS_PER_SEC ) {
-        delta -= CLOCKS_PER_SEC;
+    if( delta >= 1000 ) {
+        delta -= 1000;
         prevTicks = nowTicks - delta;
         fps = numFramesDrawn;
         numFramesDrawn = 0;
@@ -276,11 +283,18 @@ void display() {
 
     stringstream ss;
     ss << fps << " fps";
+
+    // timer
+    float seconds = (nowTicks-startTime) / 1000.0f;
+    stringstream timer_ss;
+    timer_ss << seconds;
     
     glColor3f(0, 0, 0);
     glRasterPos2f(20, formHeight - 20);
     glutBitmapString(GLUT_BITMAP_9_BY_15, (const unsigned char *) ss.str().c_str());
 
+    glRasterPos2f(formWidth - 100, formHeight - 20);
+    glutBitmapString(GLUT_BITMAP_9_BY_15, (const unsigned char *) timer_ss.str().c_str());
 
     // animate
     glutSwapBuffers();

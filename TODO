@@ -1,6 +1,8 @@
 Version 0.1.0 (Project 1)
 * control panel viewport
     - elapsed time in the control panel
+    - time stops when you get to victory and flashes
+    - "FINISH" shows up flashing too
 * mesh data structure - load .obj files from disk and render them
 * gravity
     - menu for toggling spec mode and normal mode

@@ -85,6 +85,10 @@ po::variables_map vm;
 
 unsigned char keyActions[NumActions];
 
+int startX, startY;
+int finishX, finishY;
+int reqX, reqY;
+
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
 
@@ -166,9 +170,15 @@ void init() {
 
     // initialize program
     // create maze object
-    maze = new Maze(10, 10, 0, 0, 9, 9);
+    startX = 0;
+    startY = 0;
+    finishX = 9;
+    finishY = 9;
+    reqX = 5;
+    reqY = 5;
+    maze = new Maze(10, 10);
     mazeView = new MazeView(*maze, Vec3<float>(0, 0, 0),
-        Vec3<float>(200,200,10));
+        Vec3<float>(200,200,10), startX, startY, finishX, finishY, reqX, reqY);
     mazeView->init();
 
     // create camera

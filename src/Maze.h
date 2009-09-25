@@ -19,15 +19,9 @@ class Maze {
 
         // ctor
         Maze(int width, int height);
-        Maze(int width, int height, int startX, int startY, int endX, int endY);
         ~Maze();
 
         // accessors
-        inline int startX() const { return m_startX; }
-        inline int startY() const { return m_startY; }
-        inline int endX() const { return m_endX; }
-        inline int endY() const { return m_endY; }
-
         inline int width() const { return m_width; }
         inline int height() const { return m_height; }
 
@@ -44,9 +38,6 @@ class Maze {
             int y;
         } MazeCell;
         
-        int m_startX, m_startY;
-        int m_endX, m_endY;
-
         int m_width, m_height;
 
         Array2D<MazeCell> m_maze;

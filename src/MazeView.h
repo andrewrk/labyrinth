@@ -19,7 +19,8 @@ class MazeView : public Drawable {
         // size.y - y compenent of the 2d maze
         // size.z - how tall the walls go up
         MazeView(const Maze &maze, const Vec3<float> &pos,
-            const Vec3<float> &size);
+            const Vec3<float> &size, int startX, int startY,
+            int finishX, int finishY, int reqX, int reqY);
         ~MazeView();
 
     protected:
@@ -45,6 +46,10 @@ class MazeView : public Drawable {
         void renderPost(Vec3<float> loc);
         Vec3<float> getCornerLoc(int x, int y);
         void createPosts();
+
+        int m_startX, m_startY;
+        int m_finishX, m_finishY;
+        int m_reqX, m_reqY;
 
 };
 

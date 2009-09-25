@@ -10,23 +10,6 @@ using namespace std;
 
 
 Maze::Maze(int width, int height) :
-    m_startX(0),
-    m_startY(0),
-    m_endX(width-1),
-    m_endY(height-1),
-    m_width(width),
-    m_height(height),
-    m_maze(width, height)
-{
-    generateMaze();
-}
-
-Maze::Maze(int width, int height, int startX, int startY,
-                int endX, int endY) :
-    m_startX(startX),
-    m_startY(startY),
-    m_endX(endX),
-    m_endY(endY),
     m_width(width),
     m_height(height),
     m_maze(width, height)

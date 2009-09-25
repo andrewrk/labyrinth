@@ -8,10 +8,17 @@ using namespace std;
 #define PI 3.14159265358979
 
 MazeView::MazeView(const Maze &maze, const Vec3<float> &pos,
-        const Vec3<float> & size) :
+        const Vec3<float> & size, int startX, int startY,
+        int finishX, int finishY, int reqX, int reqY) :
     m_maze(maze),
     m_pos(pos),
-    m_size(size)
+    m_size(size),
+    m_startX(startX),
+    m_startY(startY),
+    m_finishX(finishX),
+    m_finishY(finishY),
+    m_reqX(reqX),
+    m_reqY(reqY)
 {
     m_sectorSize.x = size.x / (float)maze.width();
     m_sectorSize.y = size.y / (float)maze.height();
@@ -75,7 +82,16 @@ void MazeView::render() {
                 m_pos.y + ((float)y) * m_sectorSize.y, 0);
 
             // floor
-            glColor3f(0.1, 0.1, 0.5);
+            if( x == m_startX && y == m_startY ) {
+                glColor3f(0.98, 1.0, 0.21);
+            } else if( x== m_finishX && y == m_finishY ) {
+                glColor3f(0.84, 0.12, 0.12);
+            } else if( x== m_reqX && y == m_reqY ) {
+                glColor3f(0.51, 0.51, 0.51);
+            } else {
+                glColor3f(0.1, 0.1, 0.5);
+            }
+
             glBegin(GL_POLYGON);
                 glVertex3f(loc.x+m_sectorSize.x, loc.y, loc.z);
                 glVertex3f(loc.x+m_sectorSize.x, loc.y+m_sectorSize.y,

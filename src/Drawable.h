@@ -1,5 +1,7 @@
 // Drawable - objects that can be rendered with OpenGL
 
+#ifndef _DRAWABLE_H_
+#define _DRAWABLE_H_
 
 class Drawable {
     public:
@@ -24,4 +26,6 @@ class Drawable {
         int m_listId;
 
 };
+
+#endif
 

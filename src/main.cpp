@@ -11,6 +11,8 @@ using namespace Imath;
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
+#include "Mesh.h"
+#include "MeshInstance.h"
 #include "Maze.h"
 #include "MazeView.h"
 #include "Camera.h"
@@ -83,6 +85,9 @@ void victory();
 Maze * maze;
 MazeView * mazeView;
 Camera * camera;
+MeshInstance * stillPerson;
+MeshInstance * orbitingPerson;
+MeshInstance * mailbox;
 
 bool keyState[256] = {0};
 bool specialKeyState[256] = {0};
@@ -218,6 +223,11 @@ void init() {
         Vec3<float>(200,200,10), startX, startY, finishX, finishY, reqX, reqY);
     mazeView->init();
 
+    // load meshes
+    stillPerson = new MeshInstance(new Mesh("resources/obj/mongrolian.obj"));
+    //orbitingPerson;
+    //mailbox;
+
     moveMode = PlayMode;
     gameState = PreGame;
     countDownStop = glutGet(GLUT_ELAPSED_TIME) + 1000 * countDownSeconds;
@@ -256,6 +266,7 @@ void initMenus() {
 
 void setListRendering(bool value){
     mazeView->setListRendering(value);
+
 }
 
 void setHappyColoring(bool value){
@@ -312,6 +323,9 @@ void display() {
     // Transform and Render Objects
     glEnable(GL_DEPTH_TEST);
     mazeView->draw();
+    glColor3f(1, 1, 1);
+    stillPerson->draw();
+
 
     // control panel
     glMatrixMode(GL_PROJECTION);
@@ -321,6 +335,10 @@ void display() {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    glColor3f(1, 1, 1);
+    stillPerson->draw();
+
 
     // fps counter
     clock_t nowTicks = glutGet(GLUT_ELAPSED_TIME);

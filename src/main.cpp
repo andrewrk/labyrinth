@@ -85,6 +85,7 @@ void victory();
 Maze * maze;
 MazeView * mazeView;
 Camera * camera;
+Mesh * person;
 MeshInstance * stillPerson;
 MeshInstance * orbitingPerson;
 MeshInstance * mailbox;
@@ -175,7 +176,12 @@ int main(int argc, char *argv[]) {
 
     glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(formWidth, formHeight);
-    glutCreateWindow(PROGRAM_NAME);
+
+    string title = PROGRAM_NAME;
+    title += " ";
+    title += VERSION_STRING;
+
+    glutCreateWindow(title.c_str());
 
     init();
 
@@ -194,9 +200,6 @@ int main(int argc, char *argv[]) {
 }
 
 void init() {
-    // output version
-    cout << "Version: " << VERSION_STRING << endl;
-
     // initialize opengl
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glShadeModel(GL_SMOOTH);
@@ -224,8 +227,12 @@ void init() {
     mazeView->init();
 
     // load meshes
-    stillPerson = new MeshInstance(new Mesh("resources/obj/mongrolian.obj"));
-    //orbitingPerson;
+    person = new Mesh("resources/obj/mongrolian.obj");
+    Vec3<float> reqSector = mazeView->getSectorLoc(reqX, reqY);
+    stillPerson = new MeshInstance(person, reqSector, 1.0f, Vec3<float>(0,0,1),
+        Vec3<float>(-1, 0, 0));
+    orbitingPerson = new MeshInstance(person, reqSector, 0.5f,
+        Vec3<float>(0,0,1), Vec3<float>(1,0,0) );
     //mailbox;
 
     moveMode = PlayMode;
@@ -325,6 +332,7 @@ void display() {
     mazeView->draw();
     glColor3f(1, 1, 1);
     stillPerson->draw();
+    orbitingPerson->draw();
 
 
     // control panel
@@ -335,10 +343,6 @@ void display() {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
-    glColor3f(1, 1, 1);
-    stillPerson->draw();
-
 
     // fps counter
     clock_t nowTicks = glutGet(GLUT_ELAPSED_TIME);
@@ -548,24 +552,24 @@ void nextFrame(int value) {
                     !keyState[keyActions[ActionMoveBackward]] )
                 {
                     // move camera forward in the direction it is facing
-                    camera->moveForward(0.3);
+                    camera->moveForward(0.7);
                 } else if( keyState[keyActions[ActionMoveBackward]] &&
                             !keyState[keyActions[ActionMoveForward]] )
                 {
                     // move camera backward in the direction it is facing
-                    camera->moveBackward(0.3);
+                    camera->moveBackward(0.7);
                 }
 
                 if( keyState[keyActions[ActionStrafeLeft]] &&
                     !keyState[keyActions[ActionStrafeRight]] )
                 {
                     // strafe camera left
-                    camera->moveLeft(0.3);
+                    camera->moveLeft(0.7);
                 } else if( keyState[keyActions[ActionStrafeRight]] &&
                             !keyState[keyActions[ActionStrafeLeft]] )
                 {
                     // strafe camera right
-                    camera->moveRight(0.3);
+                    camera->moveRight(0.7);
                 }
             }
 

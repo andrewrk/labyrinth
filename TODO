@@ -1,6 +1,5 @@
 Version 0.1.0 (Project 1)
 * person rotating around a person which rotates around a mailbox
-    - mesh data structure - load .obj files from disk and render them
 * object rotating around another one without rotating itself
 * top-down map view which can be toggled with popup menu
 * fix deploy on windows

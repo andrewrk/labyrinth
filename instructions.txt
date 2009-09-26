@@ -1,0 +1,23 @@
+= Welcome to Labyrinth! =
+
+1. Installation
+2. How to Play
+3. Keyboard and Mouse Controls
+
+== Installation ==
+
+see INSTALL
+
+== How to play ==
+
+Your goal is to get to the finish square (in red) as quickly as you can. Make
+sure to check out the requirements square (in gray) along the way ;-)
+
+== Keyboard and Mouse Controls ==
+
+Mouse - look around
+W - walk forward
+S - walk backward
+A - strafe left
+D - strafe right
+

@@ -39,6 +39,8 @@ class MazeView : public Drawable {
         // rave colors!
         void setHappyColoring(bool value);
 
+        Vec3<float> getSectorLoc(int x, int y) const;
+
     protected:
         // render with opengl
         void render();
@@ -76,7 +78,6 @@ class MazeView : public Drawable {
             float obj1y2, float obj2x1, float obj2y1, float obj2x2,
             float obj2y2) const;
 
-        Vec3<float> getSectorLoc(int x, int y) const;
 
 };
 

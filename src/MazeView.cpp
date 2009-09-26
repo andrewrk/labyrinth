@@ -356,11 +356,6 @@ bool MazeView::rectCollide(float obj1x1, float obj1y1, float obj1x2,
     float o2y1 = MIN(obj2y1, obj2y2);
     float o2y2 = MAX(obj2y1, obj2y2);
 
-    //cout << "o1x1=" << o1x1 << " o1x2=" << o1x2 << " o1y1=" << o1y1 << " o1y2="
-        //<< o1y2;
-    //cout << " o2x1=" << o2x1 << " o2x2=" << o2x2 << " o2y1=" << o2y1 << " o2y2="
-        //<< o2y2 << endl;
-
     return rectCollideUnsafe(o1x1, o1y1, o1x2, o1y2, o2x1, o2y1, o2x2, o2y2);
 }
 

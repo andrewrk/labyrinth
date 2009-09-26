@@ -24,6 +24,9 @@ enum MenuItem {
     MenuShadeModel,
         MenuShadeModelSmooth,
         MenuShadeModelFlat,
+    MenuGameMode,
+        MenuGameModeNormal,
+        MenuGameModeSpec,
     MenuQuit
 };
 
@@ -84,6 +87,7 @@ int fps = 0;
 int menuId;
 int menuUseGlListsId;
 int menuShadeModelId;
+int menuGameModeId;
 
 // milliseconds in between frames 
 const int frameDelay = 17;
@@ -218,9 +222,14 @@ void initMenus() {
     glutAddMenuEntry("Smooth", MenuShadeModelSmooth);
     glutAddMenuEntry("Flat", MenuShadeModelFlat);
 
+    menuGameModeId = glutCreateMenu(menu);
+    glutAddMenuEntry("Normal", MenuGameModeNormal);
+    glutAddMenuEntry("Spectator", MenuGameModeSpec);
+
     menuId = glutCreateMenu(menu);
     glutAddSubMenu("Use glLists", menuUseGlListsId);
     glutAddSubMenu("Shade model", menuShadeModelId);
+    glutAddSubMenu("Game mode", menuGameModeId);
     glutAddMenuEntry("Quit", MenuQuit);
 
 
@@ -244,6 +253,12 @@ void menu(int value) {
             break;
         case MenuShadeModelFlat:
             glShadeModel(GL_FLAT);
+            break;
+        case MenuGameModeNormal:
+            moveMode = PlayMode;
+            break;
+        case MenuGameModeSpec:
+            moveMode = SpecMode;
             break;
         case MenuQuit:
             quitApp();

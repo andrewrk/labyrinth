@@ -1,12 +1,9 @@
 Version 0.1.0 (Project 1)
-* mesh data structure - load .obj files from disk and render them
 * person rotating around a person which rotates around a mailbox
+    - mesh data structure - load .obj files from disk and render them
 * object rotating around another one without rotating itself
 * top-down map view which can be toggled with popup menu
 * fix deploy on windows
-* bug: when you look all the way down or all the way up with Camera, it flips
-  the view
-* bug: if you walk into a wall at a corner you get stuck
 
 Version 0.2.0 (Project 2)
 * space combat simulator

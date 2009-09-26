@@ -584,21 +584,21 @@ void mouse(GLint button, GLint action, GLint x, GLint y) {
     switch(button){
         case GLUT_LEFT_BUTTON:
             if( action == GLUT_DOWN )
-                cout << "left down" << endl;
+                ;
             else
-                cout << "left up" << endl;
+                ;
             break;
         case GLUT_RIGHT_BUTTON:
             if( action == GLUT_DOWN )
-                    cout << "right down" << endl;
+                    ;
                 else
-                    cout << "right up" << endl;
+                    ;
             break;
         case GLUT_MIDDLE_BUTTON:
             if( action == GLUT_DOWN )
-                cout << "middle down" << endl;
+                ;
             else
-                cout << "middle up" << endl;
+                ;
             break;
     }
 }

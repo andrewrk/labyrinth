@@ -43,7 +43,6 @@ class Maze {
         Array2D<MazeCell> m_maze;
 
         void generateMaze();
-        
 };
 
 #endif

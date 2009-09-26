@@ -98,6 +98,7 @@ int reqX, reqY;
 
 int moveMode;
 Vec3<float> playerPos;
+float playerRadius = 2.0f;
 
 // clock() when the game starts
 clock_t startTime;
@@ -264,7 +265,7 @@ void display() {
     // build projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(80, (float)formWidth / (float)formHeight, 1, 1000);
+    gluPerspective(60, (float)formWidth / (float)formHeight, 1, 1000);
 
     // Build Camera
     glMatrixMode(GL_MODELVIEW);
@@ -419,6 +420,11 @@ void specialKeyUp(int key, int x, int y) {
     specialKeyState[key] = false;
 }
 
+// check for collisions and move the player to a valid position
+void movePlayer(const Vec3<float> & delta) {
+    playerPos = mazeView->resolveSphereCollision(playerPos,playerRadius,delta);
+}
+
 void nextFrame(int value) {
     glutTimerFunc(frameDelay, nextFrame, 0);
 
@@ -429,30 +435,35 @@ void nextFrame(int value) {
             !keyState[keyActions[ActionMoveBackward]] )
         {
             // walk forward
-            Vec3<float> walkDir = camera->look().normalized() * walkSpeed;
+            Vec3<float> walkDir = camera->look();
             walkDir.z = 0;
-            playerPos += walkDir;
+            walkDir.normalize();
+            walkDir *= walkSpeed;
+            movePlayer(walkDir);
         } else if( keyState[keyActions[ActionMoveBackward]] &&
                     !keyState[keyActions[ActionMoveForward]] )
         {
             // walk backward
-            Vec3<float> walkDir = camera->look().normalized() * walkSpeed;
+            Vec3<float> walkDir = camera->look();
             walkDir.z = 0;
-            playerPos -= walkDir;
+            walkDir.normalize();
+            walkDir *= -walkSpeed;
+            movePlayer(walkDir);
         }
 
         if( keyState[keyActions[ActionStrafeLeft]] &&
             !keyState[keyActions[ActionStrafeRight]] )
         {
             // strafe left
-            playerPos -= camera->look().cross(Vec3<float>(0, 0, 1)).normalize()
-                * walkSpeed;
+
+            movePlayer(camera->look().cross(Vec3<float>(0, 0, 1)).normalize()
+                * -walkSpeed);
         } else if( keyState[keyActions[ActionStrafeRight]] &&
                     !keyState[keyActions[ActionStrafeLeft]] )
         {
             // strafe right
-            playerPos += camera->look().cross(Vec3<float>(0, 0, 1)).normalize()
-                * walkSpeed;
+            movePlayer(camera->look().cross(Vec3<float>(0, 0, 1)).normalize()
+                * walkSpeed);
         }
 
         camera->moveTo(playerPos);

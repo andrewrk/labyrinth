@@ -1,5 +1,4 @@
 Version 0.1.0 (Project 1)
-* FLYPAPER SUCKS
 * menu for toggling spec mode and normal mode
 * control panel viewport
     - time stops when you get to victory and flashes
@@ -11,6 +10,7 @@ Version 0.1.0 (Project 1)
 * fix deploy on windows
 * bug: when you look all the way down or all the way up with Camera, it flips
   the view
+* bug: if you walk into a wall at a corner you get stuck
 
 Version 0.2.0 (Project 2)
 * space combat simulator

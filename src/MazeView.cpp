@@ -3,6 +3,9 @@
 #include <iostream>
 using namespace std;
 
+#include "ImathVecAlgo.h"
+using namespace Imath;
+
 #include "GL/freeglut.h"
 
 #define PI 3.14159265358979
@@ -286,8 +289,7 @@ const Vec3<float> MazeView::resolveSphereCollision(Vec3<float> pos,
                     loc.y - m_postSize.y)
                                                                   )
     {
-        cout << "hit north" << endl;
-        return pos;
+        newPos = pos + project(Vec3<float>(1, 0, 0), delta);
     }
 
     // south
@@ -300,8 +302,7 @@ const Vec3<float> MazeView::resolveSphereCollision(Vec3<float> pos,
                     loc.y + m_sectorSize.y - m_postSize.y)
                                                                   )
     {
-        cout << "hit south" << endl;
-        return pos;
+        newPos = pos + project(Vec3<float>(1, 0, 0), delta);
     }
 
     // west
@@ -313,10 +314,11 @@ const Vec3<float> MazeView::resolveSphereCollision(Vec3<float> pos,
                     loc.x + m_postSize.x,
                     loc.y + m_postSize.y))
     {
-        cout << "hit west " << endl;
-        return pos;
+        // project movement onto west wall plane
+        newPos = pos + project(Vec3<float>(0, 1, 0), delta);
     }
 
+    // east
     if( m_maze.cellHasWall(coord.x, coord.y, Maze::East) &&
         rectCollide(newPos.x-radius, newPos.y-radius,
                     newPos.x+radius, newPos.y+radius,
@@ -325,8 +327,7 @@ const Vec3<float> MazeView::resolveSphereCollision(Vec3<float> pos,
                     loc.x + m_sectorSize.x + m_postSize.x,
                     loc.y + m_postSize.y))
     {
-        cout << "hit east" << endl;
-        return pos;
+        newPos = pos + project(Vec3<float>(0, 1, 0), delta);
     }
 
     return newPos;

@@ -45,6 +45,16 @@ enum MovementModes {
     SpecMode,
 
     // length of the enum
+    NumMovementModes
+};
+
+enum GameState {
+    PreGame,
+    GamePlay,
+    GameWon,
+    GameLost,
+
+    // length
     NumGameStates
 };
 
@@ -68,6 +78,7 @@ unsigned char getKeyFor(unsigned char key);
 
 void menu(int value);
 void initMenus();
+void victory();
 
 Maze * maze;
 MazeView * mazeView;
@@ -106,8 +117,14 @@ float playerRadius = 2.0f;
 
 // clock() when the game starts
 clock_t startTime;
+float finishTime; // in seconds
 
 float walkSpeed = 0.4f;
+const int countDownSeconds = 4;
+clock_t countDownStop;
+int countDownLeft; // seconds till game starts
+
+int gameState;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -202,6 +219,8 @@ void init() {
     mazeView->init();
 
     moveMode = PlayMode;
+    gameState = PreGame;
+    countDownStop = glutGet(GLUT_ELAPSED_TIME) + 1000 * countDownSeconds;
 
     // create camera
     playerPos = Vec3<float>(10, 10, 2);
@@ -210,7 +229,6 @@ void init() {
     activateWindow();
 
 
-    startTime = glutGet(GLUT_ELAPSED_TIME);
 }
 
 void initMenus() {
@@ -238,6 +256,10 @@ void initMenus() {
 
 void setListRendering(bool value){
     mazeView->setListRendering(value);
+}
+
+void setHappyColoring(bool value){
+    mazeView->setHappyColoring(value);
 }
 
 void menu(int value) {
@@ -314,16 +336,25 @@ void display() {
     stringstream ss;
     ss << fps << " fps";
 
-    // timer
-    float seconds = (nowTicks-startTime) / 1000.0f;
-    stringstream timer_ss;
-    timer_ss << seconds;
-    
     glColor3f(0, 0, 0);
     glRasterPos2f(20, formHeight - 20);
     glutBitmapString(GLUT_BITMAP_9_BY_15, (const unsigned char *) ss.str().c_str());
 
-    glRasterPos2f(formWidth - 100, formHeight - 20);
+    // timer
+    stringstream timer_ss;
+
+    if( gameState == GamePlay ) {
+        float seconds = (nowTicks-startTime) / 1000.0f;
+        timer_ss << "GO! " << seconds;
+        glRasterPos2f(formWidth - 100, formHeight - 20);
+    } else if( gameState == PreGame ) {
+        timer_ss << "READY? " << (int) countDownLeft;
+        glRasterPos2f(formWidth / 2 - 40, formHeight / 2 - 40);
+    } else {
+        timer_ss << "YOU WIN! Time: " << finishTime;
+        glRasterPos2f(formWidth / 2 - 40, formHeight / 2 - 40);
+    }
+
     glutBitmapString(GLUT_BITMAP_9_BY_15, (const unsigned char *) timer_ss.str().c_str());
 
     // animate
@@ -443,69 +474,95 @@ void movePlayer(const Vec3<float> & delta) {
 void nextFrame(int value) {
     glutTimerFunc(frameDelay, nextFrame, 0);
 
-    if( moveMode == PlayMode ) {
-        // move the player 
+    switch(gameState) {
+        case PreGame:
+            // countdown timer
+            countDownLeft = (countDownStop - glutGet(GLUT_ELAPSED_TIME)) / 1000;
 
-        if( keyState[keyActions[ActionMoveForward]] &&
-            !keyState[keyActions[ActionMoveBackward]] )
-        {
-            // walk forward
-            Vec3<float> walkDir = camera->look();
-            walkDir.z = 0;
-            walkDir.normalize();
-            walkDir *= walkSpeed;
-            movePlayer(walkDir);
-        } else if( keyState[keyActions[ActionMoveBackward]] &&
-                    !keyState[keyActions[ActionMoveForward]] )
-        {
-            // walk backward
-            Vec3<float> walkDir = camera->look();
-            walkDir.z = 0;
-            walkDir.normalize();
-            walkDir *= -walkSpeed;
-            movePlayer(walkDir);
-        }
+            if( countDownLeft <= 0 ) {
+                gameState = GamePlay;
+                startTime = glutGet(GLUT_ELAPSED_TIME);
+            }
+            break;
+        case GamePlay:
+        case GameWon:
+            if( moveMode == PlayMode ) {
+                // move the player 
 
-        if( keyState[keyActions[ActionStrafeLeft]] &&
-            !keyState[keyActions[ActionStrafeRight]] )
-        {
-            // strafe left
+                if( keyState[keyActions[ActionMoveForward]] &&
+                    !keyState[keyActions[ActionMoveBackward]] )
+                {
+                    // walk forward
+                    Vec3<float> walkDir = camera->look();
+                    walkDir.z = 0;
+                    walkDir.normalize();
+                    walkDir *= walkSpeed;
+                    movePlayer(walkDir);
+                } else if( keyState[keyActions[ActionMoveBackward]] &&
+                            !keyState[keyActions[ActionMoveForward]] )
+                {
+                    // walk backward
+                    Vec3<float> walkDir = camera->look();
+                    walkDir.z = 0;
+                    walkDir.normalize();
+                    walkDir *= -walkSpeed;
+                    movePlayer(walkDir);
+                }
 
-            movePlayer(camera->look().cross(Vec3<float>(0, 0, 1)).normalize()
-                * -walkSpeed);
-        } else if( keyState[keyActions[ActionStrafeRight]] &&
-                    !keyState[keyActions[ActionStrafeLeft]] )
-        {
-            // strafe right
-            movePlayer(camera->look().cross(Vec3<float>(0, 0, 1)).normalize()
-                * walkSpeed);
-        }
+                if( keyState[keyActions[ActionStrafeLeft]] &&
+                    !keyState[keyActions[ActionStrafeRight]] )
+                {
+                    // strafe left
 
-        camera->moveTo(playerPos);
-    } else if ( moveMode == SpecMode ) {
-        if( keyState[keyActions[ActionMoveForward]] &&
-            !keyState[keyActions[ActionMoveBackward]] )
-        {
-            // move camera forward in the direction it is facing
-            camera->moveForward(0.3);
-        } else if( keyState[keyActions[ActionMoveBackward]] &&
-                    !keyState[keyActions[ActionMoveForward]] )
-        {
-            // move camera backward in the direction it is facing
-            camera->moveBackward(0.3);
-        }
+                    movePlayer(camera->look().cross(Vec3<float>(0, 0, 1)).normalize()
+                        * -walkSpeed);
+                } else if( keyState[keyActions[ActionStrafeRight]] &&
+                            !keyState[keyActions[ActionStrafeLeft]] )
+                {
+                    // strafe right
+                    movePlayer(camera->look().cross(Vec3<float>(0, 0, 1)).normalize()
+                        * walkSpeed);
+                }
 
-        if( keyState[keyActions[ActionStrafeLeft]] &&
-            !keyState[keyActions[ActionStrafeRight]] )
-        {
-            // strafe camera left
-            camera->moveLeft(0.3);
-        } else if( keyState[keyActions[ActionStrafeRight]] &&
-                    !keyState[keyActions[ActionStrafeLeft]] )
-        {
-            // strafe camera right
-            camera->moveRight(0.3);
-        }
+                camera->moveTo(playerPos);
+            } else if ( moveMode == SpecMode ) {
+                if( keyState[keyActions[ActionMoveForward]] &&
+                    !keyState[keyActions[ActionMoveBackward]] )
+                {
+                    // move camera forward in the direction it is facing
+                    camera->moveForward(0.3);
+                } else if( keyState[keyActions[ActionMoveBackward]] &&
+                            !keyState[keyActions[ActionMoveForward]] )
+                {
+                    // move camera backward in the direction it is facing
+                    camera->moveBackward(0.3);
+                }
+
+                if( keyState[keyActions[ActionStrafeLeft]] &&
+                    !keyState[keyActions[ActionStrafeRight]] )
+                {
+                    // strafe camera left
+                    camera->moveLeft(0.3);
+                } else if( keyState[keyActions[ActionStrafeRight]] &&
+                            !keyState[keyActions[ActionStrafeLeft]] )
+                {
+                    // strafe camera right
+                    camera->moveRight(0.3);
+                }
+            }
+
+            if( gameState == GamePlay ) { 
+                Vec2<int> coord = mazeView->coordinates(playerPos);
+                if( coord.x == finishX && coord.y == finishY )
+                    victory();
+            }
+
+            break;
+        case GameLost:
+            // spin
+            camera->pointLeft(0.1);
+            camera->moveUp(3);
+            break;
     }
     
     glutPostRedisplay();
@@ -577,3 +634,13 @@ void deactivateWindow() {
     glutPassiveMotionFunc(NULL);
     glutSetCursor(GLUT_CURSOR_RIGHT_ARROW);
 }
+
+// gets called when they win
+void victory() {
+    gameState = GameWon;
+    finishTime = (glutGet(GLUT_ELAPSED_TIME) - startTime)/1000.0f;
+    setListRendering(false);
+    setHappyColoring(true);
+    walkSpeed = 2;
+}
+

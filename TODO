@@ -1,7 +1,4 @@
 Version 0.1.0 (Project 1)
-* control panel viewport
-    - time stops when you get to victory and flashes
-    - "FINISH" shows up flashing too
 * mesh data structure - load .obj files from disk and render them
 * person rotating around a person which rotates around a mailbox
 * object rotating around another one without rotating itself

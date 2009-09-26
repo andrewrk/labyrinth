@@ -1,6 +1,7 @@
 #include "MazeView.h"
 
 #include <iostream>
+#include <ctime>
 using namespace std;
 
 #include "ImathVecAlgo.h"
@@ -23,7 +24,9 @@ MazeView::MazeView(const Maze &maze, const Vec3<float> &pos,
     m_finishX(finishX),
     m_finishY(finishY),
     m_reqX(reqX),
-    m_reqY(reqY)
+    m_reqY(reqY),
+    m_happy(false),
+    m_rnd(new Rand32(time(NULL)))
 {
     m_sectorSize.x = size.x / (float)maze.width();
     m_sectorSize.y = size.y / (float)maze.height();
@@ -37,7 +40,7 @@ MazeView::MazeView(const Maze &maze, const Vec3<float> &pos,
 }
 
 MazeView::~MazeView() {
-    
+    if(m_rnd) delete m_rnd;
 }
 
 Vec3<float> MazeView::getCornerLoc(int x, int y){
@@ -101,6 +104,7 @@ void MazeView::render() {
             } else {
                 glColor3f(0.1, 0.1, 0.5);
             }
+            if(m_happy)glColor3f(m_rnd->nextf(),m_rnd->nextf(),m_rnd->nextf());
 
             glBegin(GL_POLYGON);
                 glVertex3f(loc.x+m_sectorSize.x, loc.y, loc.z);
@@ -113,22 +117,26 @@ void MazeView::render() {
             // south
             if( m_maze.cellHasWall(x,y,Maze::South) ) {
                 glColor3f(0.2, 0.8, 0.2);
+                if(m_happy)glColor3f(m_rnd->nextf(),m_rnd->nextf(),m_rnd->nextf());
                 horizWall(loc+Vec3<float>(0, m_sectorSize.y, 0));
             }
             // north
             if( y == 0 && m_maze.cellHasWall(x,y,Maze::North) ) {
                 glColor3f(0.2, 0.8, 0.2);
+                if(m_happy)glColor3f(m_rnd->nextf(),m_rnd->nextf(),m_rnd->nextf());
                 horizWall(loc);
             }
 
             // east
             if( m_maze.cellHasWall(x,y,Maze::East) ) {
                 glColor3f(0.4, 0.4, 0.1);
+                if(m_happy)glColor3f(m_rnd->nextf(),m_rnd->nextf(),m_rnd->nextf());
                 vertWall(loc+Vec3<float>(m_sectorSize.x, 0, 0));
             }
             // west
             if( x == 0 && m_maze.cellHasWall(x,y,Maze::West) ) {
                 glColor3f(0.4, 0.4, 0.1);
+                if(m_happy)glColor3f(m_rnd->nextf(),m_rnd->nextf(),m_rnd->nextf());
                 vertWall(loc);
             }
         }
@@ -136,8 +144,10 @@ void MazeView::render() {
 
     // render posts
     glColor3f(0.59, 0.65, 0.74);
-    for(unsigned int i=0; i<m_posts.size(); ++i)
+    for(unsigned int i=0; i<m_posts.size(); ++i) {
+        if(m_happy)glColor3f(m_rnd->nextf(),m_rnd->nextf(),m_rnd->nextf());
         renderPost(m_posts[i]);
+    }
 }
 
 void MazeView::cylinder(Vec3<float> basePt, float radius, float height,
@@ -359,4 +369,8 @@ bool MazeView::rectCollideUnsafe(float obj1x1, float obj1y1, float obj1x2,
 {
     return !( obj1y1 > obj2y2 || obj2y1 > obj1y2 ||
         obj1x1 > obj2x2 || obj2x1 > obj1x2 );
+}
+
+void MazeView:: setHappyColoring(bool value) {
+    m_happy = value;
 }

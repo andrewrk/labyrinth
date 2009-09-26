@@ -10,6 +10,7 @@
 using namespace std;
 
 #include "ImathVec.h"
+#include "ImathRandom.h"
 using namespace Imath;
 
 
@@ -35,6 +36,9 @@ class MazeView : public Drawable {
         const Vec3<float> resolveSphereCollision(Vec3<float> pos, 
             float radius, Vec3<float> delta ) const;
 
+        // rave colors!
+        void setHappyColoring(bool value);
+
     protected:
         // render with opengl
         void render();
@@ -50,6 +54,9 @@ class MazeView : public Drawable {
         int m_startX, m_startY;
         int m_finishX, m_finishY;
         int m_reqX, m_reqY;
+
+        bool m_happy;
+        Rand32 * m_rnd;
 
         void cuboid(Vec3<float> basePt1, Vec3<float> basePt2,
             Vec3<float> basePt3, Vec3<float> basePt4, float height);
@@ -70,6 +77,7 @@ class MazeView : public Drawable {
             float obj2y2) const;
 
         Vec3<float> getSectorLoc(int x, int y) const;
+
 };
 
 #endif

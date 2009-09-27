@@ -25,8 +25,8 @@ void Drawable::init() {
 }
 
 void Drawable::draw() {
-    if( m_useListRendering )
-        glCallList(m_listId);
-    else
-        render();
+    //if( m_useListRendering )
+        //glCallList(m_listId);
+    //else
+    render();
 }

@@ -1,8 +1,11 @@
 #include "GL/freeglut.h"
+#include "ImathPlatform.h"
+
+#include "Util.h"
 
 #include "MeshInstance.h"
 
-MeshInstance::MeshInstance(Mesh * mesh, Vec3<float> pos, float scale,
+MeshInstance::MeshInstance(Mesh * mesh, Vec3<float> pos, Vec3<float> scale,
                             Vec3<float> up, Vec3<float> forward) :
     m_mesh(mesh),
     m_pos(pos),
@@ -16,7 +19,7 @@ MeshInstance::MeshInstance(Mesh * mesh, Vec3<float> pos, float scale,
 MeshInstance::MeshInstance(Mesh * mesh) :
     m_mesh(mesh),
     m_pos(Vec3<float>(0,0,0)),
-    m_scale(1.0f),
+    m_scale(Vec3<float>(1, 1, 1)),
     m_up(Vec3<float>(0, 0, 1)),
     m_forward(Vec3<float>(-1, -1, 0))
 {
@@ -25,7 +28,7 @@ MeshInstance::MeshInstance(Mesh * mesh) :
 
 // setters
 // how to scale the mesh
-void MeshInstance::setScale(float scale) {
+void MeshInstance::setScale(Vec3<float> scale) {
     m_scale = scale;
 }
 
@@ -44,7 +47,18 @@ void MeshInstance::render() {
     glPushMatrix();
 
     glTranslatef(m_pos.x, m_pos.y, m_pos.z);
-    glScalef(m_scale, m_scale, m_scale);
+
+    // rotate to correct for m_up and m_forward
+    Vec3<float> oldUp = Vec3<float>(0, 0, 1);
+    Vec3<float> oldForward = Vec3<float>(1, 0, 0);
+    Vec3<float> axis = oldUp.cross(m_up);
+    glRotatef((180.0f / M_PI) * Util::angleBetween(oldForward, m_forward),
+        oldUp.x, oldUp.y, oldUp.z);
+    glRotatef((180.0f / M_PI) * Util::angleBetween(oldUp, m_up),
+        axis.x, axis.y, axis.z);
+
+
+    glScalef(m_scale.x, m_scale.y, m_scale.z);
     m_mesh->draw();
 
     glPopMatrix();

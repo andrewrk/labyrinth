@@ -107,7 +107,7 @@ int menuShadeModelId;
 int menuGameModeId;
 
 // milliseconds in between frames 
-const int frameDelay = 17;
+const int frameDelay = 16;
 
 po::variables_map vm;
 
@@ -131,6 +131,13 @@ clock_t countDownStop;
 int countDownLeft; // seconds till game starts
 
 int gameState;
+
+const GLfloat AmbientLight[]  = { 0.3f, 0.3f, 0.3f, 1.0f };
+const GLfloat DiffuseLight[]  = { 0.5f, 0.5f, 0.5f, 1.0f };
+const GLfloat SpecularLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat SpecRef[]       = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLubyte Shine = 128;
+
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -208,6 +215,18 @@ void init() {
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CCW);
 
+    // lighting
+    glEnable(GL_LIGHTING);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, AmbientLight);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, DiffuseLight);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, SpecularLight);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, SpecRef);
+    glMateriali(GL_FRONT, GL_SHININESS, Shine);
+    glEnable(GL_NORMALIZE);
+
     glutIgnoreKeyRepeat(true);
 
     // initialize menus
@@ -227,12 +246,12 @@ void init() {
     mazeView->init();
 
     // load meshes
-    person = new Mesh("resources/obj/mongrolian.obj");
+    person = Mesh::loadFile("resources/obj/mongrolian.obj");
     Vec3<float> reqSector = mazeView->getSectorLoc(reqX, reqY);
-    stillPerson = new MeshInstance(person, reqSector, 1.0f, Vec3<float>(0,0,1),
-        Vec3<float>(-1, 0, 0));
-    orbitingPerson = new MeshInstance(person, reqSector, 0.5f,
-        Vec3<float>(0,0,1), Vec3<float>(1,0,0) );
+    stillPerson = new MeshInstance(person, reqSector, Vec3<float>(1, 1, 1),
+        Vec3<float>(0,0,1), Vec3<float>(-1, 0, 0));
+    //orbitingPerson = new MeshInstance(person, reqSector, Vec3<float>(1, 1, 1),
+        //Vec3<float>(0,0,1), Vec3<float>(1,0,0) );
     //mailbox;
 
     moveMode = PlayMode;
@@ -332,7 +351,7 @@ void display() {
     mazeView->draw();
     glColor3f(1, 1, 1);
     stillPerson->draw();
-    orbitingPerson->draw();
+    //orbitingPerson->draw();
 
 
     // control panel

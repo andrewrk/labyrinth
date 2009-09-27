@@ -1,4 +1,5 @@
-#include "MazeView.h"
+#include "MeshInstance.h"
+#include "Mesh.h"
 
 #include <iostream>
 #include <ctime>
@@ -9,7 +10,9 @@ using namespace Imath;
 
 #include "GL/freeglut.h"
 
-#define PI 3.14159265358979
+
+#include "MazeView.h"
+
 #define MAX(x,y) ((x > y) ? (x) : (y))
 #define MIN(x,y) ((x < y) ? (x) : (y))
 
@@ -26,33 +29,77 @@ MazeView::MazeView(const Maze &maze, const Vec3<float> &pos,
     m_reqX(reqX),
     m_reqY(reqY),
     m_happy(false),
-    m_rnd(new Rand32(time(NULL)))
+    m_rnd(new Rand32(time(NULL))),
+    m_meshWallVert(NULL),
+    m_meshWallHoriz(NULL),
+    m_meshPost(NULL),
+    m_meshFloor(NULL),
+    m_meshStartFloor(NULL),
+    m_meshFinishFloor(NULL),
+    m_drawables()
 {
     m_sectorSize.x = size.x / (float)maze.width();
     m_sectorSize.y = size.y / (float)maze.height();
     m_sectorSize.z = size.z;
 
-    m_postSize.x = m_sectorSize.y / 10;
-    m_postSize.y = m_sectorSize.x / 10;
-    m_postSize.z = m_sectorSize.z * 1.2;
+    m_postSize.x = m_sectorSize.y / 10.0f;
+    m_postSize.y = m_sectorSize.x / 10.0f;
+    m_postSize.z = m_sectorSize.z * 1.2f;
 
-    createPosts();
+    createDrawables();
 }
 
 MazeView::~MazeView() {
     if(m_rnd) delete m_rnd;
+
+    for(unsigned int i=0; i<m_drawables.size(); ++i){
+        delete m_drawables[i];
+    }
 }
 
-Vec3<float> MazeView::getCornerLoc(int x, int y){
-    return Vec3<float>(
-        m_pos.x + ((float)x) * m_sectorSize.x,
-        m_pos.y + ((float)y) * m_sectorSize.y, 0);
-}
+void MazeView::createDrawables() {
+    // ----- create meshes -------
+    // create a maze wall section
+    m_meshWallVert = Mesh::createUnitCube(Vec3<float>(0.4, 0.4, 0.1));
+    m_meshWallHoriz = Mesh::createUnitCube(Vec3<float>(0.8, 0.6, 0.1));
 
-void MazeView::createPosts() {
-    m_posts.clear();
+    // create a post
+    m_meshPost = Mesh::createUnitCylinder(Vec3<float>(0.59, 0.65, 0.74), 20);
+
+    // create floor planes
+    m_meshFloor = Mesh::createUnitPlane(Vec3<float>(0.1, 0.1, 0.5));
+    m_meshStartFloor = Mesh::createUnitPlane(Vec3<float>(0.2, 0.8, 0.2));
+    m_meshFinishFloor = Mesh::createUnitPlane(Vec3<float>(0.84, 0.12, 0.12));
+
+    // ----- create mesh instances ------
     int x,y;
-    Vec3<float> loc;
+    Vec3<float> up(0, 0, 1);
+    Vec3<float> forward(1, 0, 0);
+    Vec3<float> scaleNone(1, 1, 1);
+    // floor
+    for(x=0; x<m_maze.width(); ++x) {
+        for(y=0; y<m_maze.height(); ++y) {
+            Vec3<float> loc = getSectorLoc(x,y);
+            loc.x += m_sectorSize.x * 0.5;
+            loc.y += m_sectorSize.y * 0.5;
+            if( x == m_startX && y == m_startY ) {
+                m_drawables.push_back(new MeshInstance(m_meshStartFloor,
+                   loc, m_sectorSize, up, forward));
+            } else if( x== m_finishX && y == m_finishY ) {
+                m_drawables.push_back(new MeshInstance(m_meshFinishFloor,
+                    loc, m_sectorSize, up, forward));
+            } else {
+                m_drawables.push_back(new MeshInstance(m_meshFloor,
+                    loc, m_sectorSize, up, forward));
+            }
+            
+        }
+    }
+    
+    // posts
+    Vec3<float> postScale = m_postSize;
+    postScale.x *= 3;
+    postScale.y *= 3;
     for(x=0; x<m_maze.width(); ++x) {
         for(y=0; y<=m_maze.height(); ++y) {
             if( (y > 0 && m_maze.cellHasWall(x,y-1,Maze::West)    ) ||
@@ -60,14 +107,20 @@ void MazeView::createPosts() {
                 (y < m_maze.height() && m_maze.cellHasWall(x,y,Maze::West)) ||
                 (x > 0 && y > 0 && (m_maze.cellHasWall(x-1,y-1,Maze::South))))
             {
-                m_posts.push_back(getCornerLoc(x,y));
+                Vec3<float> loc = getSectorLoc(x,y);
+                loc.z += m_postSize.z * 0.5;
+                m_drawables.push_back(new MeshInstance(m_meshPost,
+                    loc, postScale, up, forward));
             }
         }
         y = 0;
         if( m_maze.cellHasWall(x,y,Maze::North) ||
             (x > 0 && (m_maze.cellHasWall(x-1,y,Maze::South))) )
         {
-            m_posts.push_back(getCornerLoc(x,y));
+            Vec3<float> loc = getSectorLoc(x,y);
+            loc.z += m_postSize.z * 0.5;
+            m_drawables.push_back(new MeshInstance(m_meshPost,
+                loc, postScale, up, forward));
         }
     }
     x = m_maze.width()-1;
@@ -75,7 +128,56 @@ void MazeView::createPosts() {
         if( (y > 0 && m_maze.cellHasWall(x,y-1,Maze::East)) ||
             (y < m_maze.height() && m_maze.cellHasWall(x,y,Maze::East)) )
         {
-            m_posts.push_back(getCornerLoc(x+1,y));
+            Vec3<float> loc = getSectorLoc(x+1,y);
+            loc.z += m_postSize.z * 0.5;
+            m_drawables.push_back(new MeshInstance(m_meshPost,
+                loc, postScale, up, forward));
+        }
+    }
+
+    // walls
+    for(int x=0; x<m_maze.width(); ++x) {
+        for(int y=0; y<m_maze.height(); ++y) {
+            Vec3<float> loc = getSectorLoc(x,y);
+            // south
+            Vec3<float> horizScale;
+            horizScale.x = m_sectorSize.x - m_postSize.x*2;
+            horizScale.y = m_postSize.y*2;
+            horizScale.z = m_sectorSize.z;
+            if( m_maze.cellHasWall(x,y,Maze::South) ) {
+                m_drawables.push_back(new MeshInstance(m_meshWallHoriz,
+                    loc+Vec3<float>(horizScale.x*0.5+m_postSize.x,
+                        m_sectorSize.y-horizScale.y*0.5+m_postSize.y,
+                        horizScale.z*0.5),
+                    horizScale, up, forward));
+            }
+            // north
+            if( y == 0 && m_maze.cellHasWall(x,y,Maze::North) ) {
+                m_drawables.push_back(new MeshInstance(m_meshWallHoriz,
+                    loc+Vec3<float>(horizScale.x*0.5+m_postSize.x,
+                        horizScale.y*0.5-m_postSize.y, horizScale.z*0.5),
+                    horizScale, up, forward));
+            }
+
+            // east
+            Vec3<float> vertScale;
+            vertScale.x = m_postSize.x*2;
+            vertScale.y = m_sectorSize.y - m_postSize.y*2;
+            vertScale.z = m_sectorSize.z;
+            if( m_maze.cellHasWall(x,y,Maze::East) ) {
+                m_drawables.push_back(new MeshInstance(m_meshWallVert,
+                    loc+Vec3<float>(m_sectorSize.x+vertScale.x*0.5-m_postSize.x,
+                        vertScale.y*0.5+m_postSize.y, vertScale.z*0.5),
+                    vertScale, up, forward));
+            }
+
+            // west
+            if( x == 0 && m_maze.cellHasWall(x,y,Maze::West) ) {
+                m_drawables.push_back(new MeshInstance(m_meshWallVert,
+                    loc+Vec3<float>(vertScale.x*0.5-m_postSize.y,
+                        vertScale.y*0.5+m_postSize.y, vertScale.z*0.5),
+                    vertScale, up, forward));
+            }
         }
     }
 }
@@ -88,177 +190,35 @@ Vec3<float> MazeView::getSectorLoc(int x, int y) const {
 }
 
 void MazeView::render() {
-    // display each wall
-    for(int x=0; x<m_maze.width(); ++x) {
-        for(int y=0; y<m_maze.height(); ++y) {
-            // rectangle from m_pos+x*m_sectorSize to m_pos+(x+1)*sectorSize
-            Vec3<float> loc = getSectorLoc(x,y);
-
-            // floor
-            if( x == m_startX && y == m_startY ) {
-                glColor3f(0.98, 1.0, 0.21);
-            } else if( x== m_finishX && y == m_finishY ) {
-                glColor3f(0.84, 0.12, 0.12);
-            } else if( x== m_reqX && y == m_reqY ) {
-                glColor3f(0.51, 0.51, 0.51);
-            } else {
-                glColor3f(0.1, 0.1, 0.5);
-            }
-            if(m_happy)glColor3f(m_rnd->nextf(),m_rnd->nextf(),m_rnd->nextf());
-
-            glBegin(GL_POLYGON);
-                glVertex3f(loc.x+m_sectorSize.x, loc.y, loc.z);
-                glVertex3f(loc.x+m_sectorSize.x, loc.y+m_sectorSize.y,
-                    loc.z);
-                glVertex3f(loc.x, loc.y+m_sectorSize.y, loc.z);
-                glVertex3f(loc.x, loc.y, loc.z);
-            glEnd();
-            
-            // south
-            if( m_maze.cellHasWall(x,y,Maze::South) ) {
-                glColor3f(0.2, 0.8, 0.2);
-                if(m_happy)glColor3f(m_rnd->nextf(),m_rnd->nextf(),m_rnd->nextf());
-                horizWall(loc+Vec3<float>(0, m_sectorSize.y, 0));
-            }
-            // north
-            if( y == 0 && m_maze.cellHasWall(x,y,Maze::North) ) {
-                glColor3f(0.2, 0.8, 0.2);
-                if(m_happy)glColor3f(m_rnd->nextf(),m_rnd->nextf(),m_rnd->nextf());
-                horizWall(loc);
-            }
-
-            // east
-            if( m_maze.cellHasWall(x,y,Maze::East) ) {
-                glColor3f(0.4, 0.4, 0.1);
-                if(m_happy)glColor3f(m_rnd->nextf(),m_rnd->nextf(),m_rnd->nextf());
-                vertWall(loc+Vec3<float>(m_sectorSize.x, 0, 0));
-            }
-            // west
-            if( x == 0 && m_maze.cellHasWall(x,y,Maze::West) ) {
-                glColor3f(0.4, 0.4, 0.1);
-                if(m_happy)glColor3f(m_rnd->nextf(),m_rnd->nextf(),m_rnd->nextf());
-                vertWall(loc);
-            }
-        }
-    }
-
-    // render posts
-    glColor3f(0.59, 0.65, 0.74);
-    for(unsigned int i=0; i<m_posts.size(); ++i) {
-        if(m_happy)glColor3f(m_rnd->nextf(),m_rnd->nextf(),m_rnd->nextf());
-        renderPost(m_posts[i]);
+    for(unsigned int i=0; i<m_drawables.size(); ++i){
+        m_drawables[i]->draw();
     }
 }
 
-void MazeView::cylinder(Vec3<float> basePt, float radius, float height,
-    int numSides)
-{
-    float step = 2 * PI / (float) numSides;
 
-    // wrap
-    glBegin(GL_QUAD_STRIP);
-        for(int i = 0; i <= numSides; ++i ) {
-            float rad = i * step;
-            float x = radius * cos(rad);
-            float y = radius * sin(rad);
+//void MazeView::horizWall(Vec3<float> loc) {
+    //cuboid(
+        //loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
+        //loc+Vec3<float>(m_sectorSize.x-m_postSize.x, m_postSize.y,
+            //0),
+        //loc+Vec3<float>(m_sectorSize.x-m_postSize.x, -m_postSize.y,
+            //0),
+        //loc+Vec3<float>(m_postSize.x, -m_postSize.y, 0),
+        //m_sectorSize.z);
+//}
 
-            // top
-            glVertex3f(basePt.x+x, basePt.y+y, basePt.z+height);
+//void MazeView::vertWall(Vec3<float> loc) {
+    //cuboid(
+        //loc+Vec3<float>(-m_postSize.x, m_sectorSize.y-m_postSize.y, 0),
+        //loc+Vec3<float>(m_postSize.x, m_sectorSize.y-m_postSize.y, 0),
+        //loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
+        //loc+Vec3<float>(-m_postSize.x, m_postSize.y, 0),
+        //m_sectorSize.z);
+//}
 
-            // bottom
-            glVertex3f(basePt.x+x, basePt.y+y, basePt.z);
-        }
-    glEnd();
-
-    // put caps on it
-    // top
-    glBegin(GL_TRIANGLE_FAN);
-        // center point
-        glVertex3f(basePt.x, basePt.y, basePt.z+height);
-        
-        // outside
-        for(int i = 0; i <= numSides; ++i ) {
-            float rad = i * step;
-            float x = radius * cos(rad);
-            float y = radius * sin(rad);
-
-            glVertex3f(basePt.x+x, basePt.y+y, basePt.z+height);
-        }
-
-    glEnd();
-
-    // bottom
-    glBegin(GL_TRIANGLE_FAN);
-        // center point
-        glVertex3f(basePt.x, basePt.y, basePt.z);
-        
-        // outside
-        for(int i = numSides; i >= 0; --i ) {
-            float rad = i * step;
-            float x = radius * cos(rad);
-            float y = radius * sin(rad);
-
-            glVertex3f(basePt.x+x, basePt.y+y, basePt.z);
-        }
-    glEnd();
-    
-}
-
-void MazeView::cuboid(Vec3<float> basePt1, Vec3<float> basePt2,
-    Vec3<float> basePt3, Vec3<float> basePt4, float height)
-{
-    // box
-    glBegin(GL_QUAD_STRIP);
-        glVertex3f(basePt1.x, basePt1.y, basePt1.z);
-        glVertex3f(basePt1.x, basePt1.y, basePt1.z+height);
-        glVertex3f(basePt2.x, basePt2.y, basePt2.z);
-        glVertex3f(basePt2.x, basePt2.y, basePt2.z+height);
-        glVertex3f(basePt3.x, basePt3.y, basePt3.z);
-        glVertex3f(basePt3.x, basePt3.y, basePt3.z+height);
-        glVertex3f(basePt4.x, basePt4.y, basePt4.z);
-        glVertex3f(basePt4.x, basePt4.y, basePt4.z+height);
-        glVertex3f(basePt1.x, basePt1.y, basePt1.z);
-        glVertex3f(basePt1.x, basePt1.y, basePt1.z+height);
-    glEnd();
-
-    // put on caps
-    glBegin(GL_POLYGON);
-        glVertex3f(basePt1.x, basePt1.y, basePt1.z);
-        glVertex3f(basePt2.x, basePt2.y, basePt2.z);
-        glVertex3f(basePt3.x, basePt3.y, basePt3.z);
-        glVertex3f(basePt4.x, basePt4.y, basePt4.z);
-    glEnd();
-    glBegin(GL_POLYGON);
-        glVertex3f(basePt4.x, basePt4.y, basePt4.z+height);
-        glVertex3f(basePt3.x, basePt3.y, basePt3.z+height);
-        glVertex3f(basePt2.x, basePt2.y, basePt2.z+height);
-        glVertex3f(basePt1.x, basePt1.y, basePt1.z+height);
-    glEnd();
-}
-
-void MazeView::horizWall(Vec3<float> loc) {
-    cuboid(
-        loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
-        loc+Vec3<float>(m_sectorSize.x-m_postSize.x, m_postSize.y,
-            0),
-        loc+Vec3<float>(m_sectorSize.x-m_postSize.x, -m_postSize.y,
-            0),
-        loc+Vec3<float>(m_postSize.x, -m_postSize.y, 0),
-        m_sectorSize.z);
-}
-
-void MazeView::vertWall(Vec3<float> loc) {
-    cuboid(
-        loc+Vec3<float>(-m_postSize.x, m_sectorSize.y-m_postSize.y, 0),
-        loc+Vec3<float>(m_postSize.x, m_sectorSize.y-m_postSize.y, 0),
-        loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
-        loc+Vec3<float>(-m_postSize.x, m_postSize.y, 0),
-        m_sectorSize.z);
-}
-
-void MazeView::renderPost(Vec3<float> loc) {
-    cylinder(loc, m_postSize.x, m_postSize.z);
-}
+//void MazeView::renderPost(Vec3<float> loc) {
+    //cylinder(loc, m_postSize.x, m_postSize.z);
+//}
 
 const Vec2<int> MazeView::coordinates(const Vec3<float> & location) const {
     Vec3<float> coords = (location - m_pos) / m_sectorSize;

@@ -2,7 +2,6 @@
 #define _CAMERA_H_
 
 #include "ImathVec.h"
-#include "ImathMatrix.h"
 using namespace Imath;
 
 class Camera {
@@ -46,9 +45,6 @@ class Camera {
 
         // should be called when either m_pos or m_look changes
         inline void calcRefPoint() { m_refPoint = m_pos + m_look; }
-
-        static void rotateVector(Vec3<float> & vec,
-            const Vec3<float> & axis, float radians);
 };
 
 #endif

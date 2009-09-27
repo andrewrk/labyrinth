@@ -1,12 +1,11 @@
-#include "Camera.h"
-
 #include <iostream>
-#include <cmath>
 using namespace std;
 
-#include "GL/glut.h"
+#include "GL/freeglut.h"
 
-#define PI 3.14159265358979
+#include "Util.h"
+
+#include "Camera.h"
 
 Camera::Camera(const Vec3<float> & pos, const Vec3<float> & up,
         const Vec3<float> & look) :
@@ -85,23 +84,9 @@ void Camera::moveBackward(float distance) {
     moveForward(-distance);
 }
 
-void Camera::rotateVector(Vec3<float> & vec,
-    const Vec3<float> & axis, float radians)
-{
-    Vec3<float> normAxis = axis.normalized();
-    Matrix33<float> I;
-    Matrix33<float> L(
-        0, normAxis.z, -normAxis.y,
-        -normAxis.z, 0, normAxis.x,
-        normAxis.y, -normAxis.x, 0
-    );
-    float d = normAxis.length();
-    vec *= ( I + (sin(radians)/d) * L + (((1 - cos(radians))/(d*d)) * (L * L) ));
-}
-
 void Camera::pointLeft(float radians) {
-    radians = fmodf(radians, 2*PI);
-    rotateVector(m_look, Vec3<float>(0,0,1), radians);
+    radians = fmodf(radians, 2*M_PI);
+    Util::rotateVector(m_look, Vec3<float>(0,0,1), radians);
     calcRefPoint();
 }
 
@@ -111,8 +96,8 @@ void Camera::pointRight(float radians) {
 
 void Camera::pointUp(float radians) {
     // rotate about left vector
-    radians = fmodf(radians, 2*PI);
-    rotateVector(m_look, m_look.cross(m_up), radians);
+    radians = fmodf(radians, 2*M_PI);
+    Util::rotateVector(m_look, m_look.cross(m_up), radians);
     calcRefPoint();
 }
 

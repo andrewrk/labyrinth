@@ -5,15 +5,15 @@
 
 class MeshInstance : public Drawable {
     public:
-        MeshInstance(Mesh * mesh, Vec3<float> pos, float scale, Vec3<float> up,
-            Vec3<float> forward);
+        MeshInstance(Mesh * mesh, Vec3<float> pos, Vec3<float> scale,
+            Vec3<float> up, Vec3<float> forward);
         MeshInstance(Mesh * mesh);
 
         // setters
         // where is it
         void setPos(Vec3<float> pos);
         // how to scale the mesh
-        void setScale(float scale); 
+        void setScale(Vec3<float> scale); 
         // vector pointing up
         void setUp(Vec3<float> up);
         // vector pointing forward
@@ -21,20 +21,21 @@ class MeshInstance : public Drawable {
 
         // accessors
         inline Vec3<float> pos() const { return m_pos; }
-        inline float scale() const { return m_scale; }
+        inline Vec3<float> scale() const { return m_scale; }
         inline Vec3<float> up() const { return m_up; }
         inline Vec3<float> forward() const { return m_forward; }
 
         void draw();
+    protected:
+        void render();
 
     private:
         Mesh * m_mesh;
         Vec3<float> m_pos;
-        float m_scale;
+        Vec3<float> m_scale;
         Vec3<float> m_up;
         Vec3<float> m_forward;
 
-        void render();
 };
 
 #endif

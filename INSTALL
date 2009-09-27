@@ -5,6 +5,7 @@ cmake 2.6
 freeglut
 opengl
 ilmbase
+boost-program-options
 
 == Build instructions ==
 

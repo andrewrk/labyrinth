@@ -5,6 +5,7 @@
 
 #include "Maze.h"
 #include "Drawable.h"
+#include "Mesh.h"
 
 #include <vector>
 using namespace std;
@@ -60,15 +61,20 @@ class MazeView : public Drawable {
         bool m_happy;
         Rand32 * m_rnd;
 
-        void cuboid(Vec3<float> basePt1, Vec3<float> basePt2,
-            Vec3<float> basePt3, Vec3<float> basePt4, float height);
-        void cylinder(Vec3<float> basePt, float radius, float height,
-            int numSides = 20);
+        // meshes 
+        Mesh * m_meshWallVert;
+        Mesh * m_meshWallHoriz;
+        Mesh * m_meshPost;
+        Mesh * m_meshFloor;
+        Mesh * m_meshStartFloor;
+        Mesh * m_meshFinishFloor;
+
+        // list of drawables
+        vector<Drawable *> m_drawables;
 
         void vertWall(Vec3<float> loc);
         void horizWall(Vec3<float> loc);
         void renderPost(Vec3<float> loc);
-        Vec3<float> getCornerLoc(int x, int y);
         void createPosts();
 
         bool rectCollide(float obj1x1, float obj1y1, float obj1x2,
@@ -78,6 +84,7 @@ class MazeView : public Drawable {
             float obj1y2, float obj2x1, float obj2y1, float obj2x2,
             float obj2y2) const;
 
+        void createDrawables();
 
 };
 

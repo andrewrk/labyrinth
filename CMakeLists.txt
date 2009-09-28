@@ -27,6 +27,13 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/include/version.h.in
     ${OUT_INCLUDE_PATH}/version.h)
 MESSAGE("Compiling version ${VERSION}")
 
+# set folders to install to
+IF(WIN32)
+    SET(LABYRINTH_DATA_DIR ".")
+ELSE(WIN32)
+    SET(LABYRINTH_DATA_DIR "share")
+ENDIF(WIN32)
+
 # check for freeglut
 FIND_PACKAGE(FREEGLUT)
 IF(FREEGLUT_FOUND)
@@ -74,6 +81,9 @@ ELSE(Boost_FOUND)
     MESSAGE("Could not find boost")
 ENDIF(Boost_FOUND)
 
+# make sub directories
+ADD_SUBDIRECTORY("resources")
+
 SET(CMAKE_CXX_FLAGS "-ggdb -Wall")
 
 FILE(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
@@ -106,4 +116,3 @@ MESSAGE(
 "If everything is OK, proceed with\n"
 "make\n"
 )
-

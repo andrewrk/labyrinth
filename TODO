@@ -3,7 +3,7 @@ Version 0.1.0 (Project 1)
 
 Version 0.2.0 (Project 2)
 * space combat simulator
-* use vertex buffer not glBegin() glEnd()
+* use vertex buffer objects
 * texturing
 * lighting
 * background scenery

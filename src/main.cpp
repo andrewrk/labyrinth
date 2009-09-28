@@ -442,7 +442,7 @@ void display() {
     stringstream ss;
     ss << fps << " fps";
 
-    glColor3f(0, 0, 0);
+    glColor3f(1, 1, 1);
     glRasterPos2f(20, formHeight - 20);
     glutBitmapString(GLUT_BITMAP_9_BY_15, (const unsigned char *) ss.str().c_str());
 

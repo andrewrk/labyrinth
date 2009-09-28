@@ -1,9 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <ctime>
 using namespace std;
 
-#include "ImathGL.h"
+#include "GL/freeglut.h"
+
 #include "ImathRandom.h"
 using namespace Imath;
 
@@ -175,15 +177,24 @@ vector<string> Mesh::split_string(const string& str, const string& split_str)
 }
 
 void Mesh::render() {
+    Vec3<float> * v;
     glBegin(GL_TRIANGLES);
         for(unsigned int i=0; i<m_vertexIndices.size(); ++i) {
-            if( m_haveColors )
-                glColor(m_colors[m_colorIndices[i]]);
-            if( m_haveNormals )
-                glNormal(m_normals[m_normalIndices[i]]);
-            if( m_haveTexCoords )
-                glTexCoord(m_textureCoords[m_textureCoordIndices[i]]);
-            glVertex(m_vertices[m_vertexIndices[i]]);
+            if( m_haveColors ) {
+                v = &m_colors[m_colorIndices[i]];
+                glColor3f(v->x,v->y,v->z);
+            }
+            if( m_haveNormals ) {
+                v = &m_normals[m_normalIndices[i]];
+                glNormal3f(v->x,v->y,v->z);
+            }
+            if( m_haveTexCoords ) {
+                Vec2<float> * v2 = &m_textureCoords[m_textureCoordIndices[i]];
+                glTexCoord2f(v2->x,v2->y);
+            }
+            
+            v = &m_vertices[m_vertexIndices[i]];
+            glVertex3f(v->x,v->y,v->z);
         }
     glEnd();
 }

@@ -33,6 +33,9 @@ enum MenuItem {
         MenuAnimateSpeedSlow,
         MenuAnimateSpeedMedium,
         MenuAnimateSpeedFast,
+    MenuMiniMap,
+        MenuMiniMapOn,
+        MenuMiniMapOff,
     MenuQuit
 };
 
@@ -111,6 +114,7 @@ int menuUseGlListsId;
 int menuShadeModelId;
 int menuGameModeId;
 int menuAnimateSpeedId;
+int menuMiniMapId;
 
 // milliseconds in between frames 
 const int frameDelay = 16;
@@ -157,6 +161,8 @@ float orbit1Radius = 10;
 float orbit2Angle = 0;
 float orbit2Speed = 0.1f;
 float orbit2Radius = 1;
+
+bool miniMapOn = true;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -314,11 +320,16 @@ void initMenus() {
     glutAddMenuEntry("Medium", MenuAnimateSpeedMedium);
     glutAddMenuEntry("Fast", MenuAnimateSpeedFast);
 
+    menuMiniMapId = glutCreateMenu(menu);
+    glutAddMenuEntry("On", MenuMiniMapOn);
+    glutAddMenuEntry("Off", MenuMiniMapOff);
+
     menuId = glutCreateMenu(menu);
     glutAddSubMenu("Use glLists", menuUseGlListsId);
     glutAddSubMenu("Shade model", menuShadeModelId);
     glutAddSubMenu("Game mode", menuGameModeId);
     glutAddSubMenu("Animation speed", menuAnimateSpeedId);
+    glutAddSubMenu("Mini map", menuMiniMapId);
     glutAddMenuEntry("Quit", MenuQuit);
 
     glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -362,6 +373,12 @@ void menu(int value) {
             break;
         case MenuAnimateSpeedFast:
             orbitSpeed = 2.0f;
+            break;
+        case MenuMiniMapOn:
+            miniMapOn = true;
+            break;
+        case MenuMiniMapOff:
+            miniMapOn = false;
             break;
         case MenuQuit:
             quitApp();
@@ -407,6 +424,9 @@ void display() {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    if( miniMapOn )
+        mazeView->draw();
 
     // fps counter
     clock_t nowTicks = glutGet(GLUT_ELAPSED_TIME);

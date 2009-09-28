@@ -89,6 +89,7 @@ Mesh * person;
 Mesh * lady;
 MeshInstance * stillPerson;
 MeshInstance * orbitingPerson;
+MeshInstance * orb2;
 
 bool keyState[256] = {0};
 bool specialKeyState[256] = {0};
@@ -142,9 +143,15 @@ vector<Drawable *> drawables;
 
 Vec3<float> sectorSize;
 
-float orbitAngle;
-float orbitSpeed = 0.1f;
-float orbitRadius = 3;
+float orbitSpeed = 1.0f;
+
+float orbit1Angle = 0;
+float orbit1Speed = 0.01f;
+float orbit1Radius = 10;
+
+float orbit2Angle = 0;
+float orbit2Speed = 0.1f;
+float orbit2Radius = 1;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -244,8 +251,8 @@ void init() {
     // create maze object
     startX = 0;
     startY = 0;
-    finishX = 0;
-    finishY = 0;
+    finishX = 9;
+    finishY = 9;
     reqX = 5;
     reqY = 5;
     maze = new Maze(10, 10);
@@ -265,6 +272,8 @@ void init() {
     Vec3<float> orbiterLoc = personLoc + lady->size() * ladyScale;
     orbitingPerson = new MeshInstance(lady, orbiterLoc, ladyScale,
         Vec3<float>(0,0,1), Vec3<float>(1,0,0) );
+    orb2 = new MeshInstance(person, personLoc, Vec3<float>(0.1, 0.1, 0.1),
+        Vec3<float>(0, -1, 0), Vec3<float>(0, 1, 0));
 
     drawables.push_back(mazeView);
     drawables.push_back(stillPerson);
@@ -368,6 +377,7 @@ void display() {
     glColor3f(1, 1, 1);
     stillPerson->draw();
     orbitingPerson->draw();
+    orb2->draw();
 
 
     // control panel
@@ -532,11 +542,16 @@ void nextFrame(int value) {
     glutTimerFunc(frameDelay, nextFrame, 0);
 
     // perform orbiting
-    orbitAngle += orbitSpeed;
-    Vec3<float> center = stillPerson->pos();
-    orbitingPerson->setPos(Vec3<float>(center.x+orbitRadius*cosf(orbitAngle), 
-                                        center.y+orbitRadius*sinf(orbitAngle),
-                                        center.z));
+    orbit1Angle += orbit1Speed * orbitSpeed;
+    orbit2Angle += orbit2Speed * orbitSpeed;
+    Vec3<float> center1 = stillPerson->pos();
+    orbitingPerson->setPos(
+        Vec3<float>(center1.x+orbit1Radius*cosf(orbit1Angle), 
+        center1.y+orbit1Radius*sinf(orbit1Angle), center1.z));
+    Vec3<float> center2 = orbitingPerson->pos();
+    orb2->setPos(Vec3<float>(center2.x,
+                             center2.y+orbit2Radius*cosf(orbit2Angle),
+                             center2.z+orbit2Radius*sinf(orbit2Angle)));
 
     switch(gameState) {
         case PreGame:

@@ -29,6 +29,10 @@ enum MenuItem {
     MenuGameMode,
         MenuGameModeNormal,
         MenuGameModeSpec,
+    MenuAnimateSpeed,
+        MenuAnimateSpeedSlow,
+        MenuAnimateSpeedMedium,
+        MenuAnimateSpeedFast,
     MenuQuit
 };
 
@@ -106,6 +110,7 @@ int menuId;
 int menuUseGlListsId;
 int menuShadeModelId;
 int menuGameModeId;
+int menuAnimateSpeedId;
 
 // milliseconds in between frames 
 const int frameDelay = 16;
@@ -304,12 +309,17 @@ void initMenus() {
     glutAddMenuEntry("Normal", MenuGameModeNormal);
     glutAddMenuEntry("Spectator", MenuGameModeSpec);
 
+    menuAnimateSpeedId = glutCreateMenu(menu);
+    glutAddMenuEntry("Slow", MenuAnimateSpeedSlow);
+    glutAddMenuEntry("Medium", MenuAnimateSpeedMedium);
+    glutAddMenuEntry("Fast", MenuAnimateSpeedFast);
+
     menuId = glutCreateMenu(menu);
     glutAddSubMenu("Use glLists", menuUseGlListsId);
     glutAddSubMenu("Shade model", menuShadeModelId);
     glutAddSubMenu("Game mode", menuGameModeId);
+    glutAddSubMenu("Animation speed", menuAnimateSpeedId);
     glutAddMenuEntry("Quit", MenuQuit);
-
 
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
@@ -343,6 +353,15 @@ void menu(int value) {
             break;
         case MenuGameModeSpec:
             moveMode = SpecMode;
+            break;
+        case MenuAnimateSpeedSlow:
+            orbitSpeed = 0.5f;
+            break;
+        case MenuAnimateSpeedMedium:
+            orbitSpeed = 1.0f;
+            break;
+        case MenuAnimateSpeedFast:
+            orbitSpeed = 2.0f;
             break;
         case MenuQuit:
             quitApp();

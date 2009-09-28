@@ -70,6 +70,7 @@ void MazeView::createDrawables() {
     m_meshFloor = Mesh::createUnitPlane(Vec3<float>(0.1, 0.1, 0.5));
     m_meshStartFloor = Mesh::createUnitPlane(Vec3<float>(0.2, 0.8, 0.2));
     m_meshFinishFloor = Mesh::createUnitPlane(Vec3<float>(0.84, 0.12, 0.12));
+    m_meshFinishFloor->superHappyFunTime();
 
     // ----- create mesh instances ------
     int x,y;

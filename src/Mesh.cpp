@@ -4,6 +4,8 @@
 using namespace std;
 
 #include "ImathGL.h"
+#include "ImathRandom.h"
+using namespace Imath;
 
 #include "Mesh.h"
 
@@ -276,3 +278,16 @@ void Mesh::triangle(vector<int> & vertexIndices, int v1, int v2, int v3) {
     vertexIndices.push_back(v3);
 }
 
+void Mesh::superHappyFunTime() {
+    // forget colors, it's all about rainbows!
+    Rand32 m_rnd(time(NULL));
+    m_colors.resize(m_vertexIndices.size());
+    m_colorIndices.resize(m_vertexIndices.size());
+    for(unsigned int i=0; i<m_vertexIndices.size(); ++i){
+        m_colorIndices[i] = i;
+        m_colors[i] = Vec3<float>(m_rnd.nextf()/1.0f,
+                                    m_rnd.nextf()/1.0f,
+                                    m_rnd.nextf()/1.0f );
+    }
+    m_haveColors = true;
+}

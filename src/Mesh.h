@@ -29,6 +29,8 @@ class Mesh : public Drawable {
         // centered at origin from -0.5 to 0.5, z=0
         static Mesh * createUnitPlane(Vec3<float> color);
 
+        void superHappyFunTime();
+
     private:
         typedef Vec3<float> Vec3f;
         typedef Vec2<float> Vec2f;

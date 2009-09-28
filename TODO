@@ -4,8 +4,6 @@ Version 0.1.0 (Project 1)
 * animation speed options - slow, medium, fast
 * top-down map view which can be toggled with popup menu
 * fix deploy on windows
-* rainbow object
-* add normals / lighting
 
 Version 0.2.0 (Project 2)
 * space combat simulator

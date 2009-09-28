@@ -13,7 +13,6 @@ MeshInstance::MeshInstance(Mesh * mesh, Vec3<float> pos, Vec3<float> scale,
     m_up(up),
     m_forward(forward)
 {
-    m_mesh->init();
 }
 
 MeshInstance::MeshInstance(Mesh * mesh) :
@@ -23,7 +22,6 @@ MeshInstance::MeshInstance(Mesh * mesh) :
     m_up(Vec3<float>(0, 0, 1)),
     m_forward(Vec3<float>(-1, -1, 0))
 {
-    m_mesh->init();
 }
 
 // setters
@@ -62,10 +60,5 @@ void MeshInstance::render() {
     m_mesh->draw();
 
     glPopMatrix();
-}
-
-void MeshInstance::draw() {
-    // we can't cache stuff, just do the render
-    render();
 }
 

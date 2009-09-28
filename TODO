@@ -1,5 +1,4 @@
 Version 0.1.0 (Project 1)
-* fix list rendering
 * person rotating around a person which rotates around a mailbox
 * object rotating around another one without rotating itself
 * animation speed options - slow, medium, fast

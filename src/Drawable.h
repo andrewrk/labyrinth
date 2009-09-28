@@ -11,11 +11,8 @@ class Drawable {
         // actually draws the object to opengl
         void draw();
 
-        // must be called after the constructor
-        void init();
-
         // turn list rendering on or off
-        inline void setListRendering(bool value) { m_useListRendering = value; }
+        void setListRendering(bool value);
 
     protected:
         // call opengl commands, might get stored in a glList

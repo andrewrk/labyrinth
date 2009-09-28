@@ -37,10 +37,12 @@ class MazeView : public Drawable {
         const Vec3<float> resolveSphereCollision(Vec3<float> pos, 
             float radius, Vec3<float> delta ) const;
 
+        Vec3<float> getSectorLoc(int x, int y) const;
+
         // rave colors!
         void setHappyColoring(bool value);
 
-        Vec3<float> getSectorLoc(int x, int y) const;
+        void setListRendering(bool value);
 
     protected:
         // render with opengl
@@ -71,11 +73,6 @@ class MazeView : public Drawable {
 
         // list of drawables
         vector<Drawable *> m_drawables;
-
-        void vertWall(Vec3<float> loc);
-        void horizWall(Vec3<float> loc);
-        void renderPost(Vec3<float> loc);
-        void createPosts();
 
         bool rectCollide(float obj1x1, float obj1y1, float obj1x2,
             float obj1y2, float obj2x1, float obj2y1, float obj2x2,

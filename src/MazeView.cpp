@@ -329,3 +329,9 @@ bool MazeView::rectCollideUnsafe(float obj1x1, float obj1y1, float obj1x2,
 void MazeView:: setHappyColoring(bool value) {
     m_happy = value;
 }
+
+void MazeView::setListRendering(bool value) {
+    for(unsigned int i=0; i<m_drawables.size(); ++i) {
+        m_drawables[i]->setListRendering(value);
+    }
+}

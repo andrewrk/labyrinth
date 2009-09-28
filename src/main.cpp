@@ -132,12 +132,7 @@ int countDownLeft; // seconds till game starts
 
 int gameState;
 
-const GLfloat AmbientLight[]  = { 0.3f, 0.3f, 0.3f, 1.0f };
-const GLfloat DiffuseLight[]  = { 0.5f, 0.5f, 0.5f, 1.0f };
-const GLfloat SpecularLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-const GLfloat SpecRef[]       = { 0.7f, 0.7f, 0.7f, 1.0f };
-const GLubyte Shine = 128;
-
+vector<Drawable *> drawables;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -215,18 +210,6 @@ void init() {
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CCW);
 
-    // lighting
-    glEnable(GL_LIGHTING);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, AmbientLight);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, DiffuseLight);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, SpecularLight);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, SpecRef);
-    glMateriali(GL_FRONT, GL_SHININESS, Shine);
-    glEnable(GL_NORMALIZE);
-
     glutIgnoreKeyRepeat(true);
 
     // initialize menus
@@ -243,16 +226,18 @@ void init() {
     maze = new Maze(10, 10);
     mazeView = new MazeView(*maze, Vec3<float>(0, 0, 0),
         Vec3<float>(200,200,10), startX, startY, finishX, finishY, reqX, reqY);
-    mazeView->init();
 
     // load meshes
     person = Mesh::loadFile("resources/obj/mongrolian.obj");
     Vec3<float> reqSector = mazeView->getSectorLoc(reqX, reqY);
     stillPerson = new MeshInstance(person, reqSector, Vec3<float>(1, 1, 1),
         Vec3<float>(0,0,1), Vec3<float>(-1, 0, 0));
-    //orbitingPerson = new MeshInstance(person, reqSector, Vec3<float>(1, 1, 1),
-        //Vec3<float>(0,0,1), Vec3<float>(1,0,0) );
+    orbitingPerson = new MeshInstance(person, reqSector, Vec3<float>(1, 1, 1),
+        Vec3<float>(0,0,1), Vec3<float>(1,0,0) );
     //mailbox;
+    drawables.push_back(mazeView);
+    drawables.push_back(stillPerson);
+    drawables.push_back(orbitingPerson);
 
     moveMode = PlayMode;
     gameState = PreGame;
@@ -264,7 +249,7 @@ void init() {
 
     activateWindow();
 
-
+    setListRendering(true);
 }
 
 void initMenus() {
@@ -291,8 +276,9 @@ void initMenus() {
 }
 
 void setListRendering(bool value){
-    mazeView->setListRendering(value);
-
+    for(unsigned int i=0; i<drawables.size(); ++i){
+        mazeView->setListRendering(value);
+    }
 }
 
 void setHappyColoring(bool value){
@@ -351,7 +337,7 @@ void display() {
     mazeView->draw();
     glColor3f(1, 1, 1);
     stillPerson->draw();
-    //orbitingPerson->draw();
+    orbitingPerson->draw();
 
 
     // control panel

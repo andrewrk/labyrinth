@@ -25,7 +25,6 @@ class MeshInstance : public Drawable {
         inline Vec3<float> up() const { return m_up; }
         inline Vec3<float> forward() const { return m_forward; }
 
-        void draw();
     protected:
         void render();
 

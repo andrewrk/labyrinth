@@ -142,6 +142,10 @@ vector<Drawable *> drawables;
 
 Vec3<float> sectorSize;
 
+float orbitAngle;
+float orbitSpeed = 0.1f;
+float orbitRadius = 3;
+
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
 
@@ -526,6 +530,13 @@ void movePlayer(const Vec3<float> & delta) {
 
 void nextFrame(int value) {
     glutTimerFunc(frameDelay, nextFrame, 0);
+
+    // perform orbiting
+    orbitAngle += orbitSpeed;
+    Vec3<float> center = stillPerson->pos();
+    orbitingPerson->setPos(Vec3<float>(center.x+orbitRadius*cosf(orbitAngle), 
+                                        center.y+orbitRadius*sinf(orbitAngle),
+                                        center.z));
 
     switch(gameState) {
         case PreGame:

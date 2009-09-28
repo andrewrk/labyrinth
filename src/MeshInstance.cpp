@@ -66,3 +66,6 @@ void MeshInstance::moveBy(const Vec3<float> & delta) {
     m_pos += delta;
 }
 
+void MeshInstance::setPos(Vec3<float> pos) {
+    m_pos = pos;
+}

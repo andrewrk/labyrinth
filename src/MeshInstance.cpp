@@ -62,3 +62,7 @@ void MeshInstance::render() {
     glPopMatrix();
 }
 
+void MeshInstance::moveBy(const Vec3<float> & delta) {
+    m_pos += delta;
+}
+

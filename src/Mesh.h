@@ -31,6 +31,8 @@ class Mesh : public Drawable {
 
         void superHappyFunTime();
 
+        inline Vec3<float> size() { return m_size; }
+
     private:
         typedef Vec3<float> Vec3f;
         typedef Vec2<float> Vec2f;
@@ -48,6 +50,10 @@ class Mesh : public Drawable {
         bool m_haveNormals;
         bool m_haveTexCoords;
         bool m_haveColors;
+
+        Vec3<float> m_size;
+        Vec3<float> m_beginCorner;
+        Vec3<float> m_endCorner;
 
         Mesh();
 

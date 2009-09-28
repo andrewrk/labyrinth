@@ -12,6 +12,7 @@ class MeshInstance : public Drawable {
         // setters
         // where is it
         void setPos(Vec3<float> pos);
+        void moveBy(const Vec3<float> & delta);
         // how to scale the mesh
         void setScale(Vec3<float> scale); 
         // vector pointing up

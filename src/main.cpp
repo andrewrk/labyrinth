@@ -86,9 +86,9 @@ Maze * maze;
 MazeView * mazeView;
 Camera * camera;
 Mesh * person;
+Mesh * lady;
 MeshInstance * stillPerson;
 MeshInstance * orbitingPerson;
-MeshInstance * mailbox;
 
 bool keyState[256] = {0};
 bool specialKeyState[256] = {0};
@@ -132,7 +132,15 @@ int countDownLeft; // seconds till game starts
 
 int gameState;
 
+const GLfloat AmbientLight[]  = { 0.3f, 0.3f, 0.3f, 1.0f };
+const GLfloat DiffuseLight[]  = { 0.5f, 0.5f, 0.5f, 1.0f };
+const GLfloat SpecularLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat SpecRef[]       = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLubyte Shine = 128;
+
 vector<Drawable *> drawables;
+
+Vec3<float> sectorSize;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -210,6 +218,19 @@ void init() {
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CCW);
 
+    // lighting
+    glEnable(GL_LIGHTING);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, AmbientLight);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, DiffuseLight);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, SpecularLight);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, SpecRef);
+    glMateriali(GL_FRONT, GL_SHININESS, Shine);
+    glEnable(GL_NORMALIZE);
+    
+
     glutIgnoreKeyRepeat(true);
 
     // initialize menus
@@ -219,22 +240,28 @@ void init() {
     // create maze object
     startX = 0;
     startY = 0;
-    finishX = 9;
-    finishY = 9;
+    finishX = 0;
+    finishY = 0;
     reqX = 5;
     reqY = 5;
     maze = new Maze(10, 10);
     mazeView = new MazeView(*maze, Vec3<float>(0, 0, 0),
         Vec3<float>(200,200,10), startX, startY, finishX, finishY, reqX, reqY);
+    sectorSize = mazeView->sectorSize();
 
     // load meshes
     person = Mesh::loadFile("resources/obj/mongrolian.obj");
-    Vec3<float> reqSector = mazeView->getSectorLoc(reqX, reqY);
-    stillPerson = new MeshInstance(person, reqSector, Vec3<float>(1, 1, 1),
-        Vec3<float>(0,0,1), Vec3<float>(-1, 0, 0));
-    orbitingPerson = new MeshInstance(person, reqSector, Vec3<float>(1, 1, 1),
+    lady = Mesh::loadFile("resources/obj/lady.obj");
+    Vec3<float> reqSector = mazeView->getSectorLoc(finishX, finishY);
+    Vec3<float> personLoc = reqSector + 
+        Vec3<float>(0.5*sectorSize.x,0.5*sectorSize.y, 2*person->size().z);
+    stillPerson = new MeshInstance(person, personLoc,
+        Vec3<float>(1, 1, 1), Vec3<float>(0,-1,0), Vec3<float>(0, 0, 0));
+    Vec3<float> ladyScale = Vec3<float>(0.5, 0.5, 0.5);
+    Vec3<float> orbiterLoc = personLoc + lady->size() * ladyScale;
+    orbitingPerson = new MeshInstance(lady, orbiterLoc, ladyScale,
         Vec3<float>(0,0,1), Vec3<float>(1,0,0) );
-    //mailbox;
+
     drawables.push_back(mazeView);
     drawables.push_back(stillPerson);
     drawables.push_back(orbitingPerson);
@@ -247,9 +274,8 @@ void init() {
     playerPos = Vec3<float>(10, 10, 2);
     camera = new Camera(playerPos, Vec3<float>(0,0,1), Vec3<float>(1,1,0));
 
-    activateWindow();
-
     setListRendering(true);
+    activateWindow();
 }
 
 void initMenus() {

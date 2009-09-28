@@ -12,7 +12,10 @@ using namespace Imath;
 Mesh::Mesh() :
     m_haveNormals(false),
     m_haveTexCoords(false),
-    m_haveColors(false)
+    m_haveColors(false),
+    m_size(Vec3<float>(0, 0, 0)),
+    m_beginCorner(Vec3<float>(0, 0, 0)),
+    m_endCorner(Vec3<float>(0, 0, 0))
 {
     
 }
@@ -49,6 +52,13 @@ Mesh * Mesh::loadFile(const char * file) {
 
                 default:
                     sscanf(current_line, "v %f %f %f", &x,&y,&z);
+                    if( x < mesh->m_beginCorner.x ) mesh->m_beginCorner.x = x;
+                    if( y < mesh->m_beginCorner.y ) mesh->m_beginCorner.y = y;
+                    if( z < mesh->m_beginCorner.z ) mesh->m_beginCorner.z = z;
+                    if( x > mesh->m_endCorner.x ) mesh->m_endCorner.x = x;
+                    if( y > mesh->m_endCorner.y ) mesh->m_endCorner.y = y;
+                    if( z > mesh->m_endCorner.z ) mesh->m_endCorner.z = z;
+
                     mesh->m_vertices.push_back(Vec3f(x, y, z));
                     break;
                 }
@@ -117,6 +127,8 @@ Mesh * Mesh::loadFile(const char * file) {
         mesh->m_normalIndices.size() == mesh->m_vertexIndices.size();
     mesh->m_haveTexCoords =
         mesh->m_textureCoordIndices.size() == mesh->m_vertexIndices.size();
+
+    mesh->m_size = mesh->m_endCorner - mesh->m_beginCorner;
     return mesh;
 }
 
@@ -210,6 +222,10 @@ Mesh * Mesh::createUnitCylinder(Vec3<float> color, int numSides) {
     mesh->m_haveColors = true;
     mesh->m_haveNormals = false;
     mesh->m_haveTexCoords = false;
+
+    mesh->m_size = Vec3<float>(1.0f, 1.0f, 1.0f);
+    mesh->m_beginCorner = Vec3<float>(-0.5f, -0.5f, -0.5f);
+    mesh->m_endCorner = Vec3<float>(0.5f, 0.5f, 0.5f);
     return mesh;
 }
 
@@ -240,6 +256,9 @@ Mesh * Mesh::createUnitCube(Vec3<float> color) {
     mesh->m_haveColors = true;
     mesh->m_haveNormals = false;
     mesh->m_haveTexCoords = false;
+    mesh->m_size = Vec3<float>(1.0f, 1.0f, 1.0f);
+    mesh->m_beginCorner = Vec3<float>(-0.5f, -0.5f, -0.5f);
+    mesh->m_endCorner = Vec3<float>(0.5f, 0.5f, 0.5f);
     return mesh;
 }
 
@@ -264,6 +283,9 @@ Mesh * Mesh::createUnitPlane(Vec3<float> color) {
     mesh->m_haveColors = true;
     mesh->m_haveNormals = true;
     mesh->m_haveTexCoords = false;
+    mesh->m_size = Vec3<float>(1.0f, 1.0f, 0);
+    mesh->m_beginCorner = Vec3<float>(-0.5f, -0.5f, 0);
+    mesh->m_endCorner = Vec3<float>(0.5f, 0.5f, 0);
     return mesh;
 }
 

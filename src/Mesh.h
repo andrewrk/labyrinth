@@ -62,8 +62,12 @@ class Mesh : public Drawable {
         static int StrToInt(const string &str);
         static void quad(vector<int> & vertexIndices, int v1, int v2,
             int v3, int v4);
+        static void quad(vector<int> & vertexIndices,
+            vector<int> & normalIndices, int v1, int v2, int v3, int v4);
         static void triangle(vector<int> & vertexIndices, int v1, int v2,
             int v3);
+        static void triangle(vector<int> & vertexIndices,
+            vector<int> & normalIndices, int v1, int v2, int v3);
         
 };
 

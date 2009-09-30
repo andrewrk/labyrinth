@@ -27,12 +27,6 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/include/version.h.in
     ${OUT_INCLUDE_PATH}/version.h)
 MESSAGE("Compiling version ${VERSION}")
 
-# set folders to install to
-IF(WIN32)
-    SET(LABYRINTH_DATA_DIR ".")
-ELSE(WIN32)
-    SET(LABYRINTH_DATA_DIR "share")
-ENDIF(WIN32)
 
 # check for freeglut
 FIND_PACKAGE(FREEGLUT)
@@ -68,33 +62,31 @@ ELSE(ILMBASE_FOUND)
     MESSAGE("Could not find ilmbase")
 ENDIF(ILMBASE_FOUND)
 
-# check for boost
-#SET(Boost_USE_STATIC_LIBS ON)
-SET(Boost_USE_MULTITHREADED ON)
-FIND_PACKAGE(Boost 1.36.0 COMPONENTS program_options)
-IF(Boost_FOUND)
-    SET(HAVE_BOOST TRUE)
-    SET(STATUS_BOOST "OK")
-    MESSAGE("Found boost")
-ELSE(Boost_FOUND)
-    SET(STATUS_BOOST "not found")
-    MESSAGE("Could not find boost")
-ENDIF(Boost_FOUND)
-
-# make sub directories
-ADD_SUBDIRECTORY("resources")
-
 SET(CMAKE_CXX_FLAGS "-ggdb -Wall")
 
 FILE(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 FILE(GLOB_RECURSE INCLUDES ${CMAKE_SOURCE_DIR}/src/*.h)
 
-LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
-INCLUDE_DIRECTORIES(${FREEGLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} ${ILMBASE_INCLUDE_DIR} ${OUT_INCLUDE_PATH} ${Boost_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${FREEGLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} ${ILMBASE_INCLUDE_DIR} ${OUT_INCLUDE_PATH})
 LINK_LIBRARIES(labyrinth ${FREEGLUT_LIBRARIES} ${OPENGL_LIBRARIES} ${ILMBASE_LIBRARIES})
 
 ADD_EXECUTABLE(labyrinth ${SOURCES})
-TARGET_LINK_LIBRARIES(labyrinth ${Boost_LIBRARIES})
+
+# set folders to install to
+IF(WIN32)
+    SET(LABYRINTH_DATA_DIR .)
+    INSTALL(TARGETS labyrinth RUNTIME DESTINATION .)
+    INSTALL(FILES /usr/i586-mingw32msvc/bin/freeglut.dll /usr/i586-mingw32msvc/bin/Imath.dll /usr/i586-mingw32msvc/bin/Iex.dll /usr/i586-mingw32msvc/bin/Half.dll DESTINATION .)
+ELSE(WIN32)
+    SET(LABYRINTH_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/labyrinth")
+    INSTALL(TARGETS labyrinth RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+ENDIF(WIN32)
+
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/include/resources.h.in
+    ${OUT_INCLUDE_PATH}/resources.h)
+
+# make sub directories
+ADD_SUBDIRECTORY("resources")
 
 
 MESSAGE("\n"
@@ -109,7 +101,6 @@ MESSAGE(
 "* OpenGL                       : ${STATUS_OPENGL}\n"
 "* freeglut                     : ${STATUS_FREEGLUT}\n"
 "* ilmbase                      : ${STATUS_ILMBASE}\n"
-"* Boost                        : ${STATUS_BOOST}\n"
 )
 
 MESSAGE(

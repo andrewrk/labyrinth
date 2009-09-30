@@ -327,8 +327,12 @@ bool MazeView::rectCollideUnsafe(float obj1x1, float obj1y1, float obj1x2,
         obj1x1 > obj2x2 || obj2x1 > obj1x2 );
 }
 
-void MazeView:: setHappyColoring(bool value) {
+void MazeView::setHappyColoring(bool value) {
     m_happy = value;
+    m_meshFloor->superHappyFunTime();
+    m_meshPost->superHappyFunTime();
+    m_meshWallVert->superHappyFunTime();
+    m_meshWallHoriz->superHappyFunTime();
 }
 
 void MazeView::setListRendering(bool value) {

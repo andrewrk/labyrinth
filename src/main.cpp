@@ -8,9 +8,6 @@ using namespace std;
 #include "ImathVec.h"
 using namespace Imath;
 
-#include <boost/program_options.hpp>
-namespace po = boost::program_options;
-
 #include "Mesh.h"
 #include "MeshInstance.h"
 #include "Maze.h"
@@ -18,6 +15,7 @@ namespace po = boost::program_options;
 #include "Camera.h"
 
 #include "version.h"
+#include "resources.h"
 
 enum MenuItem {
     MenuUseGlLists,
@@ -105,7 +103,7 @@ int formWidth = 800, formHeight = 600;
 
 bool outsideWindow = true;
 
-clock_t prevTicks = 0;
+int prevTicks = 0;
 int numFramesDrawn = 0;
 int fps = 0;
 
@@ -119,8 +117,6 @@ int menuMiniMapId;
 // milliseconds in between frames 
 const int frameDelay = 16;
 
-po::variables_map vm;
-
 unsigned char keyActions[NumActions];
 
 int startX, startY;
@@ -132,18 +128,19 @@ Vec3<float> playerPos;
 float playerRadius = 2.0f;
 
 // clock() when the game starts
-clock_t startTime;
+int startTime;
 float finishTime; // in seconds
+float prevFrameTicks;
 
 float walkSpeed = 0.4f;
 const int countDownSeconds = 4;
-clock_t countDownStop;
+int countDownStop;
 int countDownLeft; // seconds till game starts
 
 int gameState;
 
 const GLfloat AmbientLight[]  = { 0.3f, 0.3f, 0.3f, 1.0f };
-const GLfloat DiffuseLight[]  = { 0.5f, 0.5f, 0.5f, 1.0f };
+const GLfloat DiffuseLight[]  = { 0.8f, 0.8f, 0.8f, 1.0f };
 const GLfloat SpecularLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat SpecRef[]       = { 0.7f, 0.7f, 0.7f, 1.0f };
 const GLubyte Shine = 128;
@@ -171,49 +168,15 @@ int main(int argc, char *argv[]) {
     string rcfile = ".";
     rcfile = rcfile + PROGRAM_NAME + "rc";
 
-    // parse command line and config file
-    po::options_description cmdDesc("Allowed options");
-    cmdDesc.add_options()
-        ("help", "produce help message")
-    ;
-    po::options_description confDesc("Configuration file options");
-    confDesc.add_options()
-        ("keys.forward",
-            po::value<unsigned char>(
-                &keyActions[ActionMoveForward])->default_value('w'),
-            "key combo for moving forward")
-        ("keys.backward",
-            po::value<unsigned char>(
-                &keyActions[ActionMoveBackward])->default_value('s'),
-            "key combo for moving backward")
-        ("keys.strafeLeft",
-            po::value<unsigned char>(
-                &keyActions[ActionStrafeLeft])->default_value('a'),
-            "key combo for strafing left")
-        ("keys.strafeRight",
-            po::value<unsigned char>(
-                &keyActions[ActionStrafeRight])->default_value('d'),
-            "key combo for strafing right")
-    ;
-    cmdDesc.add(confDesc);
-    po::store(po::parse_command_line(argc, argv, cmdDesc), vm);
-    ifstream in(rcfile.c_str(), ifstream::in);
-    po::store(po::parse_config_file(in, cmdDesc), vm);
-    po::notify(vm);
-
-    if( vm.count("help") ){
-        cout << cmdDesc << endl;
-        return 1;
-    }
+    keyActions[ActionMoveForward] = 'w';
+    keyActions[ActionStrafeLeft] = 'a';
+    keyActions[ActionMoveBackward] = 's';
+    keyActions[ActionStrafeRight] = 'd';
 
     glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(formWidth, formHeight);
 
-    string title = PROGRAM_NAME;
-    title += " ";
-    title += VERSION_STRING;
-
-    glutCreateWindow(title.c_str());
+    glutCreateWindow(PROGRAM_NAME " " VERSION_STRING);
 
     init();
 
@@ -251,7 +214,6 @@ void init() {
     glMaterialfv(GL_FRONT, GL_SPECULAR, SpecRef);
     glMateriali(GL_FRONT, GL_SHININESS, Shine);
     glEnable(GL_NORMALIZE);
-    
 
     glutIgnoreKeyRepeat(true);
 
@@ -272,8 +234,8 @@ void init() {
     sectorSize = mazeView->sectorSize();
 
     // load meshes
-    person = Mesh::loadFile("resources/obj/mongrolian.obj");
-    lady = Mesh::loadFile("resources/obj/lady.obj");
+    person = Mesh::loadFile(RESOURCE_DIR "/obj/lady.obj");
+    lady = Mesh::loadFile(RESOURCE_DIR "/obj/mongrolian.obj");
     Vec3<float> reqSector = mazeView->getSectorLoc(finishX, finishY);
     Vec3<float> personLoc = reqSector + 
         Vec3<float>(0.5*sectorSize.x,0.5*sectorSize.y, 2*person->size().z);
@@ -409,6 +371,10 @@ void display() {
 
     // Transform and Render Objects
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
     mazeView->draw();
     glColor3f(1, 1, 1);
     stillPerson->draw();
@@ -420,7 +386,12 @@ void display() {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0, formWidth, formHeight, 0);
+
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_NORMALIZE);
+    glDisable(GL_LIGHT0);
+    glDisable(GL_COLOR_MATERIAL);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -429,8 +400,8 @@ void display() {
         mazeView->draw();
 
     // fps counter
-    clock_t nowTicks = glutGet(GLUT_ELAPSED_TIME);
-    clock_t delta = nowTicks - prevTicks;
+    int nowTicks = glutGet(GLUT_ELAPSED_TIME);
+    int delta = nowTicks - prevTicks;
     if( delta >= 1000 ) {
         delta -= 1000;
         prevTicks = nowTicks - delta;
@@ -580,6 +551,10 @@ void movePlayer(const Vec3<float> & delta) {
 void nextFrame(int value) {
     glutTimerFunc(frameDelay, nextFrame, 0);
 
+    int nowTicks = glutGet(GLUT_ELAPSED_TIME);
+    float fpsRate = 1.0f +
+        ((nowTicks-prevFrameTicks) - frameDelay)/(float)frameDelay;
+
     // perform orbiting
     orbit1Angle += orbit1Speed * orbitSpeed;
     orbit2Angle += orbit2Speed * orbitSpeed;
@@ -614,7 +589,7 @@ void nextFrame(int value) {
                     Vec3<float> walkDir = camera->look();
                     walkDir.z = 0;
                     walkDir.normalize();
-                    walkDir *= walkSpeed;
+                    walkDir *= walkSpeed * fpsRate;
                     movePlayer(walkDir);
                 } else if( keyState[keyActions[ActionMoveBackward]] &&
                             !keyState[keyActions[ActionMoveForward]] )
@@ -623,7 +598,7 @@ void nextFrame(int value) {
                     Vec3<float> walkDir = camera->look();
                     walkDir.z = 0;
                     walkDir.normalize();
-                    walkDir *= -walkSpeed;
+                    walkDir *= -walkSpeed * fpsRate;
                     movePlayer(walkDir);
                 }
 
@@ -633,13 +608,13 @@ void nextFrame(int value) {
                     // strafe left
 
                     movePlayer(camera->look().cross(Vec3<float>(0, 0, 1)).normalize()
-                        * -walkSpeed);
+                        * -walkSpeed * fpsRate);
                 } else if( keyState[keyActions[ActionStrafeRight]] &&
                             !keyState[keyActions[ActionStrafeLeft]] )
                 {
                     // strafe right
                     movePlayer(camera->look().cross(Vec3<float>(0, 0, 1)).normalize()
-                        * walkSpeed);
+                        * walkSpeed * fpsRate);
                 }
 
                 camera->moveTo(playerPos);
@@ -648,24 +623,24 @@ void nextFrame(int value) {
                     !keyState[keyActions[ActionMoveBackward]] )
                 {
                     // move camera forward in the direction it is facing
-                    camera->moveForward(0.7);
+                    camera->moveForward(0.7 * fpsRate);
                 } else if( keyState[keyActions[ActionMoveBackward]] &&
                             !keyState[keyActions[ActionMoveForward]] )
                 {
                     // move camera backward in the direction it is facing
-                    camera->moveBackward(0.7);
+                    camera->moveBackward(0.7 * fpsRate);
                 }
 
                 if( keyState[keyActions[ActionStrafeLeft]] &&
                     !keyState[keyActions[ActionStrafeRight]] )
                 {
                     // strafe camera left
-                    camera->moveLeft(0.7);
+                    camera->moveLeft(0.7 * fpsRate);
                 } else if( keyState[keyActions[ActionStrafeRight]] &&
                             !keyState[keyActions[ActionStrafeLeft]] )
                 {
                     // strafe camera right
-                    camera->moveRight(0.7);
+                    camera->moveRight(0.7 * fpsRate);
                 }
             }
 
@@ -678,11 +653,12 @@ void nextFrame(int value) {
             break;
         case GameLost:
             // spin
-            camera->pointLeft(0.1);
-            camera->moveUp(3);
+            camera->pointLeft(0.1 * fpsRate);
+            camera->moveUp(3 * fpsRate);
             break;
     }
     
+    prevFrameTicks = nowTicks;
     glutPostRedisplay();
 }
 
@@ -759,6 +735,7 @@ void victory() {
     finishTime = (glutGet(GLUT_ELAPSED_TIME) - startTime)/1000.0f;
     setListRendering(false);
     setHappyColoring(true);
+    setListRendering(true);
     walkSpeed = 2;
 }
 

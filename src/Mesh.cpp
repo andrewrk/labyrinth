@@ -17,7 +17,8 @@ Mesh::Mesh() :
     m_haveColors(false),
     m_size(Vec3<float>(0, 0, 0)),
     m_beginCorner(Vec3<float>(0, 0, 0)),
-    m_endCorner(Vec3<float>(0, 0, 0))
+    m_endCorner(Vec3<float>(0, 0, 0)),
+    m_texture(NULL)
 {
     
 }
@@ -178,9 +179,18 @@ vector<string> Mesh::split_string(const string& str, const string& split_str)
 
 void Mesh::render() {
     Vec3<float> * v;
+    Vec2<float> * v2;
+
+    if( m_texture ) {
+        m_texture->bind();
+        glColor3f(1.0, 1.0, 1.0);
+    } else {
+        glDisable(GL_TEXTURE_2D);
+    }
+
     glBegin(GL_TRIANGLES);
         for(unsigned int i=0; i<m_vertexIndices.size(); ++i) {
-            if( m_haveColors ) {
+            if( m_haveColors && ! m_texture ) {
                 v = &m_colors[m_colorIndices[i]];
                 glColor3f(v->x,v->y,v->z);
             }
@@ -189,7 +199,7 @@ void Mesh::render() {
                 glNormal3f(v->x,v->y,v->z);
             }
             if( m_haveTexCoords ) {
-                Vec2<float> * v2 = &m_textureCoords[m_textureCoordIndices[i]];
+                v2 = &m_textureCoords[m_textureCoordIndices[i]];
                 glTexCoord2f(v2->x,v2->y);
             }
             
@@ -199,8 +209,20 @@ void Mesh::render() {
     glEnd();
 }
 
+Mesh * Mesh::createUnitCylinder(Texture * tex, int numSides) {
+    Mesh * mesh = createUnitCylinder(Vec3<float>(1, 1, 1), numSides);
+    mesh->m_texture = tex;
+    return mesh;
+}
+
 Mesh * Mesh::createUnitCylinder(Vec3<float> color, int numSides) {
     Mesh * mesh = new Mesh();
+    // tex coords
+    mesh->m_textureCoords.push_back(Vec2<float>(0.0f, 0.0f));
+    mesh->m_textureCoords.push_back(Vec2<float>(1.0f, 0.0f));
+    mesh->m_textureCoords.push_back(Vec2<float>(1.0f, 1.0f));
+    mesh->m_textureCoords.push_back(Vec2<float>(0.0f, 1.0f));
+
     // vertices
     for (float side = -1.0; side <= 1.0; side += 2.0) {
         float z = 0.5 * side;
@@ -212,23 +234,45 @@ Mesh * Mesh::createUnitCylinder(Vec3<float> color, int numSides) {
             mesh->m_vertices.push_back(Vec3<float>(cosf(angle) / 2.0f, sinf(angle) / 2.0f, z));
         }
     }
+    int count = 0;
     // index caps
     for (int side = 0; side <= numSides + 1; side += numSides + 1) {
         for (int i = 0; i < numSides - 1; i++) {
             triangle(mesh->m_vertexIndices, mesh->m_normalIndices, side,
                 side + i + 1, side + i + 2);
+            for(int j=0; j<3; ++j) {
+                mesh->m_textureCoordIndices.push_back(count % 4);
+                ++count;
+            }
         }
         triangle(mesh->m_vertexIndices, mesh->m_normalIndices, side,
             side + numSides, side + 1);
+        for(int j=0; j<3; ++j) {
+            mesh->m_textureCoordIndices.push_back(count % 4);
+            ++count;
+        }
     }
     // index sides
     quad(mesh->m_vertexIndices, mesh->m_normalIndices, 1, numSides + 2,
         2 * numSides + 1, 2);
-    for (int i = 1; i < numSides - 1; i++)
+    for(int j=0; j<4; ++j) {
+        mesh->m_textureCoordIndices.push_back(count % 4);
+        ++count;
+    }
+    for (int i = 1; i < numSides - 1; i++) {
         quad(mesh->m_vertexIndices, mesh->m_normalIndices, i + 1,
             2 * numSides + 2 - i, 2 * numSides + 2 - i - 1, i + 1 + 1);
+        for(int j=0; j<4; ++j) {
+            mesh->m_textureCoordIndices.push_back(count % 4);
+            ++count;
+        }
+    }
     quad(mesh->m_vertexIndices, mesh->m_normalIndices, numSides,
         numSides + 3, numSides + 2, 1);
+    for(int j=0; j<4; ++j) {
+        mesh->m_textureCoordIndices.push_back(count % 4);
+        ++count;
+    }
 
     // color
     mesh->m_colors.push_back(color);
@@ -237,11 +281,17 @@ Mesh * Mesh::createUnitCylinder(Vec3<float> color, int numSides) {
 
     mesh->m_haveColors = true;
     mesh->m_haveNormals = true;
-    mesh->m_haveTexCoords = false;
+    mesh->m_haveTexCoords = true;
 
     mesh->m_size = Vec3<float>(1.0f, 1.0f, 1.0f);
     mesh->m_beginCorner = Vec3<float>(-0.5f, -0.5f, -0.5f);
     mesh->m_endCorner = Vec3<float>(0.5f, 0.5f, 0.5f);
+    return mesh;
+}
+
+Mesh * Mesh::createUnitCube(Texture * tex) {
+    Mesh * mesh = createUnitCube(Vec3<float>(0, 0, 0));
+    mesh->m_texture = tex;
     return mesh;
 }
 
@@ -276,6 +326,21 @@ Mesh * Mesh::createUnitCube(Vec3<float> color) {
     quad(mesh->m_vertexIndices, 2, 3, 4, 5); // +y
     quad(mesh->m_vertexIndices, 5, 4, 7, 6); // +z
 
+    // texture coordinates
+    mesh->m_textureCoords.push_back(Vec2<float>(0.0f, 0.0f));
+    mesh->m_textureCoords.push_back(Vec2<float>(1.0f, 0.0f));
+    mesh->m_textureCoords.push_back(Vec2<float>(1.0f, 1.0f));
+    mesh->m_textureCoords.push_back(Vec2<float>(0.0f, 1.0f));
+
+    for(int side=0; side<6; ++side) {
+        mesh->m_textureCoordIndices.push_back(1);
+        mesh->m_textureCoordIndices.push_back(0);
+        mesh->m_textureCoordIndices.push_back(2);
+        mesh->m_textureCoordIndices.push_back(2);
+        mesh->m_textureCoordIndices.push_back(0);
+        mesh->m_textureCoordIndices.push_back(1);
+    }
+
     // all the colors are the same
     mesh->m_colors.push_back(color);
     for (unsigned int i = 0; i < mesh->m_vertexIndices.size(); i++)
@@ -283,10 +348,16 @@ Mesh * Mesh::createUnitCube(Vec3<float> color) {
 
     mesh->m_haveColors = true;
     mesh->m_haveNormals = true;
-    mesh->m_haveTexCoords = false;
+    mesh->m_haveTexCoords = true;
     mesh->m_size = Vec3<float>(1.0f, 1.0f, 1.0f);
     mesh->m_beginCorner = Vec3<float>(-0.5f, -0.5f, -0.5f);
     mesh->m_endCorner = Vec3<float>(0.5f, 0.5f, 0.5f);
+    return mesh;
+}
+
+Mesh * Mesh::createUnitPlane(Texture * tex) {
+    Mesh * mesh = createUnitPlane(Vec3<float>(1,1,1));
+    mesh->m_texture = tex;
     return mesh;
 }
 
@@ -298,7 +369,21 @@ Mesh * Mesh::createUnitPlane(Vec3<float> color) {
     mesh->m_vertices.push_back(Vec3<float>( 0.5f,  0.5f, 0));
     mesh->m_vertices.push_back(Vec3<float>( 0.5f, -0.5f, 0));
 
+    // 1,2,3; 1,3,4
     quad(mesh->m_vertexIndices, 3, 2, 1, 0);
+
+    // texture coords
+    mesh->m_textureCoords.push_back(Vec2<float>(0.0f, 0.0f));
+    mesh->m_textureCoords.push_back(Vec2<float>(1.0f, 0.0f));
+    mesh->m_textureCoords.push_back(Vec2<float>(1.0f, 1.0f));
+    mesh->m_textureCoords.push_back(Vec2<float>(0.0f, 1.0f));
+
+    mesh->m_textureCoordIndices.push_back(2);
+    mesh->m_textureCoordIndices.push_back(1);
+    mesh->m_textureCoordIndices.push_back(0);
+    mesh->m_textureCoordIndices.push_back(2);
+    mesh->m_textureCoordIndices.push_back(0);
+    mesh->m_textureCoordIndices.push_back(3);
 
     // same colors and normals
     mesh->m_colors.push_back(color);
@@ -310,7 +395,7 @@ Mesh * Mesh::createUnitPlane(Vec3<float> color) {
 
     mesh->m_haveColors = true;
     mesh->m_haveNormals = true;
-    mesh->m_haveTexCoords = false;
+    mesh->m_haveTexCoords = true;
     mesh->m_size = Vec3<float>(1.0f, 1.0f, 0);
     mesh->m_beginCorner = Vec3<float>(-0.5f, -0.5f, 0);
     mesh->m_endCorner = Vec3<float>(0.5f, 0.5f, 0);

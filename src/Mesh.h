@@ -2,6 +2,7 @@
 #define _MESH_H_
 
 #include "Drawable.h"
+#include "Texture.h"
 
 #include <vector>
 #include <string>
@@ -21,12 +22,15 @@ class Mesh : public Drawable {
         static Mesh * loadFile(const char * file);
 
         // centered at origin from -0.5 to 0.5
+        static Mesh * createUnitCube(Texture * tex);
         static Mesh * createUnitCube(Vec3<float> color);
 
         // centered at origin with radius 0.5, z from -0.5 to 0.5
+        static Mesh * createUnitCylinder(Texture * tex, int numSides);
         static Mesh * createUnitCylinder(Vec3<float> color, int numSides);
 
         // centered at origin from -0.5 to 0.5, z=0
+        static Mesh * createUnitPlane(Texture * tex);
         static Mesh * createUnitPlane(Vec3<float> color);
 
         void superHappyFunTime();
@@ -54,6 +58,8 @@ class Mesh : public Drawable {
         Vec3<float> m_size;
         Vec3<float> m_beginCorner;
         Vec3<float> m_endCorner;
+
+        Texture * m_texture;
 
         Mesh();
 

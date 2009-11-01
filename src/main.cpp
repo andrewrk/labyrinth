@@ -159,7 +159,9 @@ float orbit2Angle = 0;
 float orbit2Speed = 0.1f;
 float orbit2Radius = 1;
 
-bool miniMapOn = true;
+bool miniMapOn = false;
+
+bool usingTextures = true;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -168,10 +170,10 @@ int main(int argc, char *argv[]) {
     string rcfile = ".";
     rcfile = rcfile + PROGRAM_NAME + "rc";
 
-    keyActions[ActionMoveForward] = 'w';
+    keyActions[ActionMoveForward] = ',';
     keyActions[ActionStrafeLeft] = 'a';
-    keyActions[ActionMoveBackward] = 's';
-    keyActions[ActionStrafeRight] = 'd';
+    keyActions[ActionMoveBackward] = 'o';
+    keyActions[ActionStrafeRight] = 'e';
 
     glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(formWidth, formHeight);
@@ -194,6 +196,15 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+void setUsingTextures(bool value) {
+    if( value ) {
+        glEnable(GL_TEXTURE_2D);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    } else {
+        glDisable(GL_TEXTURE_2D);
+    }
+}
+
 void init() {
     // initialize opengl
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -202,6 +213,7 @@ void init() {
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CCW);
+    setUsingTextures(true);
 
     // lighting
     glEnable(GL_LIGHTING);

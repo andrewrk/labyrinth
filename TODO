@@ -5,7 +5,6 @@ Version 0.2.0 (Project 2)
     - ground plane
  * texturing
     - menu to turn it on and off
-    - three different textures
     - texturing method - replace - the first version the color of the texture
       defines the final color of a pixel of the polygon
     - texturing method - blend - the color of the texture is modulated with
@@ -49,3 +48,8 @@ Version 0.2.0 (Project 2)
     - up and down - forward and backward
     - left and right - rotate 
     - a and s control elevation over the ground plane 
+ * change back to qwerty
+ * fix texture coordinates for walls and cylinders
+
+Version 0.2.1
+ * MazeView - keep track of textures and delete them when done (memory leak)

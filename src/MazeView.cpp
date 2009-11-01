@@ -1,6 +1,8 @@
 #include "MeshInstance.h"
 #include "Mesh.h"
 
+#include "resources.h"
+
 #include <iostream>
 #include <ctime>
 using namespace std;
@@ -60,17 +62,22 @@ MazeView::~MazeView() {
 void MazeView::createDrawables() {
     // ----- create meshes -------
     // create a maze wall section
-    m_meshWallVert = Mesh::createUnitCube(Vec3<float>(0.4, 0.4, 0.1));
-    m_meshWallHoriz = Mesh::createUnitCube(Vec3<float>(0.8, 0.6, 0.1));
+    Bitmap * wallTexBmp =
+        new Bitmap(string(RESOURCE_DIR "/textures/brick.bmp"));
+    Texture * wallTexture = new Texture(wallTexBmp);
+    m_meshWallVert = Mesh::createUnitCube(wallTexture);
+    m_meshWallHoriz = m_meshWallVert;
 
     // create a post
-    m_meshPost = Mesh::createUnitCylinder(Vec3<float>(0.59, 0.65, 0.74), 20);
+    //m_meshPost = Mesh::createUnitCylinder(Vec3<float>(0.59, 0.65, 0.74), 20);
+    m_meshPost = Mesh::createUnitCylinder(new Texture(
+        new Bitmap(string(RESOURCE_DIR "/textures/wood.bmp"))), 20);
 
     // create floor planes
-    m_meshFloor = Mesh::createUnitPlane(Vec3<float>(0.1, 0.1, 0.5));
-    m_meshStartFloor = Mesh::createUnitPlane(Vec3<float>(0.2, 0.8, 0.2));
-    m_meshFinishFloor = Mesh::createUnitPlane(Vec3<float>(0.84, 0.12, 0.12));
-    m_meshFinishFloor->superHappyFunTime();
+    m_meshFloor = Mesh::createUnitPlane( new Texture(
+        new Bitmap(string(RESOURCE_DIR "/textures/marble.bmp"))));
+    m_meshStartFloor = m_meshFloor;
+    m_meshFinishFloor = m_meshFloor;
 
     // ----- create mesh instances ------
     int x,y;
@@ -195,31 +202,6 @@ void MazeView::render() {
         m_drawables[i]->draw();
     }
 }
-
-
-//void MazeView::horizWall(Vec3<float> loc) {
-    //cuboid(
-        //loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
-        //loc+Vec3<float>(m_sectorSize.x-m_postSize.x, m_postSize.y,
-            //0),
-        //loc+Vec3<float>(m_sectorSize.x-m_postSize.x, -m_postSize.y,
-            //0),
-        //loc+Vec3<float>(m_postSize.x, -m_postSize.y, 0),
-        //m_sectorSize.z);
-//}
-
-//void MazeView::vertWall(Vec3<float> loc) {
-    //cuboid(
-        //loc+Vec3<float>(-m_postSize.x, m_sectorSize.y-m_postSize.y, 0),
-        //loc+Vec3<float>(m_postSize.x, m_sectorSize.y-m_postSize.y, 0),
-        //loc+Vec3<float>(m_postSize.x, m_postSize.y, 0),
-        //loc+Vec3<float>(-m_postSize.x, m_postSize.y, 0),
-        //m_sectorSize.z);
-//}
-
-//void MazeView::renderPost(Vec3<float> loc) {
-    //cylinder(loc, m_postSize.x, m_postSize.z);
-//}
 
 const Vec2<int> MazeView::coordinates(const Vec3<float> & location) const {
     Vec3<float> coords = (location - m_pos) / m_sectorSize;

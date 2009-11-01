@@ -1,13 +1,51 @@
 Version 0.2.0 (Project 2)
-* space combat simulator
-* use vertex buffer objects
-* texturing
-* lighting
-* background scenery
-* use 3 different textures
-* options:
-    * texturing on and off
-    * texture - replace and texture - blend
-    * minification - simple, smooth
-    * magnification - simple, smooth
-<there is more, check the doc>
+ * texture coordinate generation
+    - cylinders
+    - boxes
+    - ground plane
+ * texturing
+    - menu to turn it on and off
+    - three different textures
+    - texturing method - replace - the first version the color of the texture
+      defines the final color of a pixel of the polygon
+    - texturing method - blend - the color of the texture is modulated with
+      the color computed by the lighting and shading equations.
+ * filtering
+    - filtering - simple
+        > Minification - simple (nearest neighbor)
+        > Magnification - simple (nearest neighbor)
+    - filtering - smooth
+        > Minification - use mip maps
+        > magnification - select the "smoothest" option
+ * normals -> per face normals - renders the scene using all per face normals
+ * normals -> per vertex normals - renders the scene using all per vertex
+   normals
+    - Normals -> per vertex normals - calculate using average
+    - normals -> per vertex normals weighted - calculate using weighted average
+ * normal visualization -> On/Off - user can see normal vectors
+ * crease angles
+    - menu option: crease angle -> 15, 25, 35, Off
+    - normals only get averaged at a vertex when the angles between the 
+      adjacent triangles is less than then crease angle.
+ * shading
+    - scene has one single light source (the sun).
+        > above but near the edges
+        > color has diffuse and specular components 1,1,1
+        > no attenuation
+    - material options:
+        > materials -> diffuse - everything is rendered with same material
+          that has a high diffuse and a low emissive component.
+        > materials -> specular - everything is rendered with a material that
+          has a high specular, high diffuse, and low emissive component
+        > materials -> Design - assign different materials to different things
+          to make the scene look good
+ * ability to move the light source around in realtime
+    - left click / right click - rotate the light source around the scene about
+      the Y axis
+ * navigation1 - View -> Overview
+    - left or right cursor - camera rotates around the terrain about the up axis
+    - up or down key / a or s key  - camera moves along the z axis
+ * navigation2 - View -> First Person
+    - up and down - forward and backward
+    - left and right - rotate 
+    - a and s control elevation over the ground plane 

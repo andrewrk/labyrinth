@@ -45,6 +45,9 @@ class MazeView : public Drawable, public MeshCalculations {
         void setListRendering(bool value);
         void calculateNormals(CalcNormalMethod mode);
 
+        
+        void setShowNormals(bool value);
+
     protected:
         // render with opengl
         void render();

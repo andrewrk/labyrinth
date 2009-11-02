@@ -20,6 +20,7 @@ class MeshCalculations {
         };
 
         virtual void calculateNormals(CalcNormalMethod mode) = 0;
+        virtual void setShowNormals(bool value) = 0;
 };
 
 class Mesh : public Drawable, public MeshCalculations {
@@ -48,9 +49,14 @@ class Mesh : public Drawable, public MeshCalculations {
         // recalculate normals
         void calculateNormals(MeshCalculations::CalcNormalMethod mode);
 
+        // show/hide normal arrows
+        void setShowNormals(bool value);
+
         void superHappyFunTime();
 
         inline Vec3<float> size() { return m_size; }
+
+        void drawNormalArrows(Vec3<float> m_scale);
 
     private:
         typedef Vec3<float> Vec3f;
@@ -75,6 +81,9 @@ class Mesh : public Drawable, public MeshCalculations {
         Vec3<float> m_endCorner;
 
         Texture * m_texture;
+
+        bool m_showNormals;
+        MeshCalculations::CalcNormalMethod m_normalMode;
 
         Mesh();
 

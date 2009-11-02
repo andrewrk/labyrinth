@@ -344,3 +344,9 @@ void MazeView::calculateNormals(MeshCalculations::CalcNormalMethod mode) {
         m_meshes[i]->calculateNormals(mode);
     }
 }
+
+void MazeView::setShowNormals(bool value) {
+    for(unsigned int i=0; i<m_meshes.size(); ++i) {
+        m_meshes[i]->setShowNormals(value);
+    }
+}

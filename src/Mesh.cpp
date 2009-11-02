@@ -18,7 +18,8 @@ Mesh::Mesh() :
     m_size(Vec3<float>(0, 0, 0)),
     m_beginCorner(Vec3<float>(0, 0, 0)),
     m_endCorner(Vec3<float>(0, 0, 0)),
-    m_texture(NULL)
+    m_texture(NULL),
+    m_showNormals(false)
 {
     
 }
@@ -430,7 +431,9 @@ void Mesh::superHappyFunTime() {
     m_haveColors = true;
 }
 
-void Mesh::calculateNormals(CalcNormalMethod mode) {
+void Mesh::calculateNormals(MeshCalculations::CalcNormalMethod mode) {
+    m_normalMode = mode;
+
     int index = 0;
     m_normals.clear();
     m_normalIndices.clear();
@@ -463,3 +466,39 @@ void Mesh::calculateNormals(CalcNormalMethod mode) {
     }
 }
 
+void Mesh::setShowNormals(bool value) {
+    m_showNormals = value;
+}
+
+void Mesh::drawNormalArrows(Vec3<float> scale) {
+    if( ! m_showNormals ) return;
+
+    const float normalLength = 2.0f;
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glBegin(GL_LINES);
+        switch(m_normalMode){
+            case MeshCalculations::Surface:
+                for( unsigned int f = 0; f < m_vertexIndices.size(); f += 3){
+                    // get the surface center
+                    Vec3<float> vertex(0.0f, 0.0f, 0.0f);
+                    for( int v = 0; v < 3; ++v ) {
+                        vertex += m_vertices[m_vertexIndices[f+v]];
+                    }
+                    vertex /= 3;
+                    glVertex3f(vertex.x, vertex.y, vertex.z);
+
+                    // add normal vector
+                    Vec3<float> normal = m_normals[m_normalIndices[f]];
+                    normal /= scale;
+                    vertex += normalLength * normal;
+                    glVertex3f(vertex.x, vertex.y, vertex.z);
+                }
+                break;
+            case MeshCalculations::Average:
+                break;
+            case MeshCalculations::WeightedAverage:
+                
+                break;
+        }
+    glEnd();
+}

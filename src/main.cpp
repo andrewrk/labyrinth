@@ -46,6 +46,9 @@ enum MenuItem {
         MenuNormalsPerFace,
         MenuNormalsPerVertexAvg,
         MenuNormalsPerVertexWeightedAvg,
+    MenuNormalArrows,
+        MenuNormalArrowsOn,
+        MenuNormalArrowsOff,
     MenuQuit
 };
 
@@ -100,6 +103,7 @@ void initMenus();
 void victory();
 void refreshLists();
 void setNormalMode(Mesh::CalcNormalMethod mode);
+void setNormalArrows(bool value);
 
 Maze * maze;
 MazeView * mazeView;
@@ -130,6 +134,7 @@ int menuMiniMapId;
 int menuTexturingId;
 int menuFilteringId;
 int menuNormalsId;
+int menuNormalArrowsId;
 
 // milliseconds in between frames 
 const int frameDelay = 16;
@@ -178,6 +183,7 @@ float orbit2Speed = 0.1f;
 float orbit2Radius = 1;
 
 bool miniMapOn = false;
+bool showNormalArrows = false;
 
 bool usingTextures = true;
 bool usingListRendering = true;
@@ -338,6 +344,10 @@ void initMenus() {
     glutAddMenuEntry("Per Vertex - Weighted Average",
         MenuNormalsPerVertexWeightedAvg);
 
+    menuNormalArrowsId = glutCreateMenu(menu);
+    glutAddMenuEntry("On", MenuNormalArrowsOn);
+    glutAddMenuEntry("Off", MenuNormalArrowsOff);
+
     menuId = glutCreateMenu(menu);
     glutAddSubMenu("Use glLists", menuUseGlListsId);
     glutAddSubMenu("Shade model", menuShadeModelId);
@@ -347,6 +357,7 @@ void initMenus() {
     glutAddSubMenu("Texturing", menuTexturingId);
     glutAddSubMenu("Filtering", menuFilteringId);
     glutAddSubMenu("Normals", menuNormalsId);
+    glutAddSubMenu("Normal Visualization", menuNormalArrowsId);
     glutAddMenuEntry("Quit", MenuQuit);
 
     glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -362,6 +373,14 @@ void setListRendering(bool value){
 void setNormalMode(MeshCalculations::CalcNormalMethod mode) {
     for(unsigned int i=0; i<meshCalcs.size(); ++i){
         meshCalcs[i]->calculateNormals(mode);
+    }
+    refreshLists();
+}
+
+
+void setNormalArrows(bool value) {
+    for(unsigned int i=0; i<meshCalcs.size(); ++i){
+        meshCalcs[i]->setShowNormals(value);
     }
     refreshLists();
 }
@@ -438,6 +457,12 @@ void menu(int value) {
             break;
         case MenuNormalsPerVertexWeightedAvg:
             setNormalMode(Mesh::WeightedAverage);
+            break;
+        case MenuNormalArrowsOn:
+            setNormalArrows(true);
+            break;
+        case MenuNormalArrowsOff:
+            setNormalArrows(false);
             break;
         case MenuQuit:
             quitApp();

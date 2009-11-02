@@ -3,7 +3,6 @@ Version 0.2.0 (Project 2)
    normals
     - Normals -> per vertex normals - calculate using average
     - normals -> per vertex normals weighted - calculate using weighted average
- * normal visualization -> On/Off - user can see normal vectors
  * crease angles
     - menu option: crease angle -> 15, 25, 35, Off
     - normals only get averaged at a vertex when the angles between the 

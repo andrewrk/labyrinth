@@ -183,14 +183,13 @@ void Mesh::render() {
 
     if( m_texture ) {
         m_texture->bind();
-        glColor3f(1.0, 1.0, 1.0);
     } else {
         glDisable(GL_TEXTURE_2D);
     }
 
     glBegin(GL_TRIANGLES);
         for(unsigned int i=0; i<m_vertexIndices.size(); ++i) {
-            if( m_haveColors && ! m_texture ) {
+            if( m_haveColors ) {
                 v = &m_colors[m_colorIndices[i]];
                 glColor3f(v->x,v->y,v->z);
             }

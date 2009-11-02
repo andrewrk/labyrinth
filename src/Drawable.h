@@ -14,6 +14,10 @@ class Drawable {
         // turn list rendering on or off
         void setListRendering(bool value);
 
+        // rerender
+        void refreshList();
+
+
     protected:
         // call opengl commands, might get stored in a glList
         virtual void render() = 0;

@@ -13,6 +13,7 @@ using namespace Imath;
 #include "Maze.h"
 #include "MazeView.h"
 #include "Camera.h"
+#include "Texture.h"
 
 #include "version.h"
 #include "resources.h"
@@ -34,6 +35,10 @@ enum MenuItem {
     MenuMiniMap,
         MenuMiniMapOn,
         MenuMiniMapOff,
+    MenuTexturing,
+        MenuTexturingReplace,
+        MenuTexturingBlend,
+        MenuTexturingOff,
     MenuQuit
 };
 
@@ -86,6 +91,7 @@ unsigned char getKeyFor(unsigned char key);
 void menu(int value);
 void initMenus();
 void victory();
+void refreshLists();
 
 Maze * maze;
 MazeView * mazeView;
@@ -113,6 +119,7 @@ int menuShadeModelId;
 int menuGameModeId;
 int menuAnimateSpeedId;
 int menuMiniMapId;
+int menuTexturingId;
 
 // milliseconds in between frames 
 const int frameDelay = 16;
@@ -162,6 +169,7 @@ float orbit2Radius = 1;
 bool miniMapOn = false;
 
 bool usingTextures = true;
+bool usingListRendering = true;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -298,23 +306,35 @@ void initMenus() {
     glutAddMenuEntry("On", MenuMiniMapOn);
     glutAddMenuEntry("Off", MenuMiniMapOff);
 
+    menuTexturingId = glutCreateMenu(menu);
+    glutAddMenuEntry("Replace", MenuTexturingReplace);
+    glutAddMenuEntry("Blend", MenuTexturingBlend);
+    glutAddMenuEntry("Off", MenuTexturingOff);
+
     menuId = glutCreateMenu(menu);
     glutAddSubMenu("Use glLists", menuUseGlListsId);
     glutAddSubMenu("Shade model", menuShadeModelId);
     glutAddSubMenu("Game mode", menuGameModeId);
     glutAddSubMenu("Animation speed", menuAnimateSpeedId);
     glutAddSubMenu("Mini map", menuMiniMapId);
+    glutAddSubMenu("Texturing", menuTexturingId);
     glutAddMenuEntry("Quit", MenuQuit);
 
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 void setListRendering(bool value){
+    usingListRendering = value;
     for(unsigned int i=0; i<drawables.size(); ++i){
-        mazeView->setListRendering(value);
+        drawables[i]->setListRendering(value);
     }
 }
 
+void refreshLists(){
+    for(unsigned int i=0; i<drawables.size(); ++i){
+        drawables[i]->refreshList();
+    }
+}
 void setHappyColoring(bool value){
     mazeView->setHappyColoring(value);
 }
@@ -353,6 +373,18 @@ void menu(int value) {
             break;
         case MenuMiniMapOff:
             miniMapOn = false;
+            break;
+        case MenuTexturingReplace:
+            Texture::setMode(Texture::ModeReplace);
+            refreshLists();
+            break;
+        case MenuTexturingBlend:
+            Texture::setMode(Texture::ModeBlend);
+            refreshLists();
+            break;
+        case MenuTexturingOff:
+            Texture::setMode(Texture::ModeOff);
+            refreshLists();
             break;
         case MenuQuit:
             quitApp();

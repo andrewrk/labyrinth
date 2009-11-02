@@ -28,6 +28,16 @@ void Drawable::setListRendering(bool value) {
     }
 }
 
+void Drawable::refreshList() {
+    if( m_useListRendering ) {
+        glDeleteLists(m_listId, 1);   
+        // pre-render the object
+        glNewList(m_listId, GL_COMPILE);
+            render();
+        glEndList();
+    }
+}
+
 void Drawable::draw() {
     if( m_useListRendering )
         glCallList(m_listId);

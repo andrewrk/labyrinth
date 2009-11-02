@@ -1,10 +1,4 @@
 Version 0.2.0 (Project 2)
- * texturing
-    - menu to turn it on and off
-    - texturing method - replace - the first version the color of the texture
-      defines the final color of a pixel of the polygon
-    - texturing method - blend - the color of the texture is modulated with
-      the color computed by the lighting and shading equations.
  * filtering
     - filtering - simple
         > Minification - simple (nearest neighbor)

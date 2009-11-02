@@ -4,6 +4,8 @@
 
 #include "GL/freeglut.h"
 
+Texture::Mode Texture::s_mode = ModeReplace;
+
 Texture::Texture(Bitmap * bmp)
     : m_bmp(bmp)
 {
@@ -34,8 +36,24 @@ Texture::~Texture() {
 
 
 void Texture::bind() {
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, m_id);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    if( s_mode != ModeOff ) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, m_id);
+    }
+    switch(s_mode){
+        case ModeReplace:
+            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+            break;
+        case ModeBlend:
+            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
+            break;
+        case ModeOff:
+            glDisable(GL_TEXTURE_2D);
+            break;
+    }
+}
+
+void Texture::setMode(Mode mode) {
+    s_mode = mode;
 }
 

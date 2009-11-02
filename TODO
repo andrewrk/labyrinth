@@ -18,13 +18,6 @@ Version 0.2.0 (Project 2)
  * ability to move the light source around in realtime
     - left click / right click - rotate the light source around the scene about
       the Y axis
- * navigation1 - View -> Overview
-    - left or right cursor - camera rotates around the terrain about the up axis
-    - up or down key / a or s key  - camera moves along the z axis
- * navigation2 - View -> First Person
-    - up and down - forward and backward
-    - left and right - rotate 
-    - a and s control elevation over the ground plane 
  * change back to qwerty
  * fix texture coordinates for walls and cylinders
  * bug: the dude is red and there is a line going from the girl to him

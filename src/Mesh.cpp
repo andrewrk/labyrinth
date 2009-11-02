@@ -447,8 +447,8 @@ void Mesh::calculateNormals(CalcNormalMethod mode) {
                 m_normals.push_back(edge1.cross(edge2));
 
                 m_normalIndices.push_back(index);
-                m_normalIndices.push_back(index+1);
-                m_normalIndices.push_back(index+2);
+                m_normalIndices.push_back(index);
+                m_normalIndices.push_back(index);
                 
                 ++index;
             }

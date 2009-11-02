@@ -333,8 +333,8 @@ Mesh * Mesh::createUnitCube(Vec3<float> color) {
     mesh->m_textureCoords.push_back(Vec2<float>(0.0f, 1.0f));
 
     for(int side=0; side<6; ++side) {
-        mesh->m_textureCoordIndices.push_back(1);
         mesh->m_textureCoordIndices.push_back(0);
+        mesh->m_textureCoordIndices.push_back(1);
         mesh->m_textureCoordIndices.push_back(2);
         mesh->m_textureCoordIndices.push_back(2);
         mesh->m_textureCoordIndices.push_back(0);

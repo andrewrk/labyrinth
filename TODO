@@ -1,8 +1,6 @@
 Version 0.2.0 (Project 2)
  * texture coordinate generation
     - cylinders
-    - boxes
-    - ground plane
  * texturing
     - menu to turn it on and off
     - texturing method - replace - the first version the color of the texture

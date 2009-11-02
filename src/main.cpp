@@ -49,6 +49,10 @@ enum MenuItem {
     MenuNormalArrows,
         MenuNormalArrowsOn,
         MenuNormalArrowsOff,
+    MenuMaterial,
+        MenuMaterialDiffuse,
+        MenuMaterialSpecular,
+        MenuMaterialDesign,
     MenuQuit
 };
 
@@ -78,6 +82,12 @@ enum GameState {
 
     // length
     NumGameStates
+};
+
+enum LightMaterial {
+    MaterialDiffuse,
+    MaterialSpecular,
+    MaterialDesign
 };
 
 int main(int argc, char *argv[]);
@@ -135,6 +145,7 @@ int menuTexturingId;
 int menuFilteringId;
 int menuNormalsId;
 int menuNormalArrowsId;
+int menuMaterialId;
 
 // milliseconds in between frames 
 const int frameDelay = 16;
@@ -161,11 +172,10 @@ int countDownLeft; // seconds till game starts
 
 int gameState;
 
-const GLfloat AmbientLight[]  = { 0.3f, 0.3f, 0.3f, 1.0f };
-const GLfloat DiffuseLight[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-const GLfloat SpecularLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-const GLfloat SpecRef[]       = { 0.7f, 0.7f, 0.7f, 1.0f };
-const GLubyte Shine = 128;
+const GLfloat goodAmbientLight[]  = { 0.3f, 0.3f, 0.3f, 1.0f };
+const GLfloat goodDiffuseLight[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat goodSpecLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLubyte shininess = 128;
 
 vector<Drawable *> drawables;
 vector<MeshCalculations *> meshCalcs;
@@ -230,6 +240,42 @@ void setUsingTextures(bool value) {
     }
 }
 
+void setMaterial(int material) {
+    const GLfloat diffuse_spec[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    const GLfloat diffuse_diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    const GLfloat diffuse_ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    const GLfloat spec_spec[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    const GLfloat spec_diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    const GLfloat spec_ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    const GLfloat design_spec[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    const GLfloat design_diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    const GLfloat design_ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    glMateriali(GL_FRONT, GL_SHININESS, shininess);
+    switch(material){
+        case MaterialDiffuse:
+            glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, diffuse_spec);
+            glMaterialfv(GL_FRONT, GL_AMBIENT, diffuse_ambient);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_diffuse);
+            break;
+        case MaterialSpecular:
+            glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, spec_spec);
+            glMaterialfv(GL_FRONT, GL_AMBIENT, spec_ambient);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, spec_diffuse);
+            break;
+        case MaterialDesign:
+            glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, design_spec);
+            glMaterialfv(GL_FRONT, GL_AMBIENT, design_ambient);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, design_diffuse);
+            break;
+    }
+}
+
 void init() {
     // initialize opengl
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -242,16 +288,14 @@ void init() {
 
     // lighting
     glEnable(GL_LIGHTING);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, AmbientLight);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, DiffuseLight);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, SpecularLight);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, goodAmbientLight);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, goodDiffuseLight);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, goodSpecLight);
     glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, SpecRef);
-    glMateriali(GL_FRONT, GL_SHININESS, Shine);
     glEnable(GL_NORMALIZE);
     Texture::setFilterMode(Texture::FilterModeSimple);
+    setMaterial(MaterialDiffuse);
 
     glutIgnoreKeyRepeat(true);
 
@@ -348,6 +392,11 @@ void initMenus() {
     glutAddMenuEntry("On", MenuNormalArrowsOn);
     glutAddMenuEntry("Off", MenuNormalArrowsOff);
 
+    menuMaterialId = glutCreateMenu(menu);
+    glutAddMenuEntry("Diffuse", MenuMaterialDiffuse);
+    glutAddMenuEntry("Specular", MenuMaterialSpecular);
+    glutAddMenuEntry("Design", MenuMaterialDesign);
+
     menuId = glutCreateMenu(menu);
     glutAddSubMenu("Use glLists", menuUseGlListsId);
     glutAddSubMenu("Shade model", menuShadeModelId);
@@ -358,6 +407,7 @@ void initMenus() {
     glutAddSubMenu("Filtering", menuFilteringId);
     glutAddSubMenu("Normals", menuNormalsId);
     glutAddSubMenu("Normal Visualization", menuNormalArrowsId);
+    glutAddSubMenu("Material", menuMaterialId);
     glutAddMenuEntry("Quit", MenuQuit);
 
     glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -463,6 +513,15 @@ void menu(int value) {
             break;
         case MenuNormalArrowsOff:
             setNormalArrows(false);
+            break;
+        case MenuMaterialDiffuse:
+            setMaterial(MaterialDiffuse);
+            break;
+        case MenuMaterialSpecular:
+            setMaterial(MaterialSpecular);
+            break;
+        case MenuMaterialDesign:
+            setMaterial(MaterialDesign);
             break;
         case MenuQuit:
             quitApp();

@@ -208,8 +208,10 @@ void Mesh::render() {
     glEnd();
 }
 
-Mesh * Mesh::createUnitCylinder(Texture * tex, int numSides) {
-    Mesh * mesh = createUnitCylinder(Vec3<float>(1, 1, 1), numSides);
+Mesh * Mesh::createUnitCylinder(Vec3<float> color, Texture * tex,
+    int numSides)
+{
+    Mesh * mesh = createUnitCylinder(color, numSides);
     mesh->m_texture = tex;
     return mesh;
 }
@@ -268,8 +270,8 @@ Mesh * Mesh::createUnitCylinder(Vec3<float> color, int numSides) {
     return mesh;
 }
 
-Mesh * Mesh::createUnitCube(Texture * tex) {
-    Mesh * mesh = createUnitCube(Vec3<float>(0, 0, 0));
+Mesh * Mesh::createUnitCube(Vec3<float> color, Texture * tex) {
+    Mesh * mesh = createUnitCube(color);
     mesh->m_texture = tex;
     return mesh;
 }
@@ -334,8 +336,8 @@ Mesh * Mesh::createUnitCube(Vec3<float> color) {
     return mesh;
 }
 
-Mesh * Mesh::createUnitPlane(Texture * tex) {
-    Mesh * mesh = createUnitPlane(Vec3<float>(1,1,1));
+Mesh * Mesh::createUnitPlane(Vec3<float> color, Texture * tex) {
+    Mesh * mesh = createUnitPlane(color);
     mesh->m_texture = tex;
     return mesh;
 }
@@ -427,3 +429,37 @@ void Mesh::superHappyFunTime() {
     }
     m_haveColors = true;
 }
+
+void Mesh::calculateNormals(CalcNormalMethod mode) {
+    int index = 0;
+    m_normals.clear();
+    m_normalIndices.clear();
+    switch(mode) {
+        case Surface:
+            for(unsigned int i=0; i<m_vertexIndices.size(); i+=3){
+                // make two edge vectors
+                Vec3<float> edge1 = m_vertices[m_vertexIndices[i]]
+                    - m_vertices[m_vertexIndices[i+1]];
+                Vec3<float> edge2 = m_vertices[m_vertexIndices[i]]
+                    - m_vertices[m_vertexIndices[i+2]];
+                    
+                // cross product is normal
+                m_normals.push_back(edge1.cross(edge2));
+
+                m_normalIndices.push_back(index);
+                m_normalIndices.push_back(index+1);
+                m_normalIndices.push_back(index+2);
+                
+                ++index;
+            }
+
+            break;
+        case Average:
+
+            break;
+        case WeightedAverage:
+
+            break;
+    }
+}
+

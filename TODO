@@ -1,5 +1,4 @@
 Version 0.2.0 (Project 2)
- * normals -> per face normals - renders the scene using all per face normals
  * normals -> per vertex normals - renders the scene using all per vertex
    normals
     - Normals -> per vertex normals - calculate using average

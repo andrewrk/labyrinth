@@ -15,7 +15,7 @@ using namespace std;
 using namespace Imath;
 
 
-class MazeView : public Drawable {
+class MazeView : public Drawable, public MeshCalculations {
     public:
         // size.x - x component of the 2d maze
         // size.y - y compenent of the 2d maze
@@ -43,6 +43,7 @@ class MazeView : public Drawable {
         void setHappyColoring(bool value);
 
         void setListRendering(bool value);
+        void calculateNormals(CalcNormalMethod mode);
 
     protected:
         // render with opengl
@@ -73,6 +74,9 @@ class MazeView : public Drawable {
 
         // list of drawables
         vector<Drawable *> m_drawables;
+
+        // list of meshes
+        vector<Mesh *> m_meshes;
 
         bool rectCollide(float obj1x1, float obj1y1, float obj1x2,
             float obj1y2, float obj2x1, float obj2y1, float obj2x2,

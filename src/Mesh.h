@@ -11,7 +11,18 @@ using namespace std;
 #include "ImathVec.h"
 using namespace Imath;
 
-class Mesh : public Drawable {
+class MeshCalculations {
+    public:
+        enum CalcNormalMethod {
+            Surface,
+            Average,
+            WeightedAverage
+        };
+
+        virtual void calculateNormals(CalcNormalMethod mode) = 0;
+};
+
+class Mesh : public Drawable, public MeshCalculations {
     public:
         ~Mesh();
 
@@ -22,16 +33,20 @@ class Mesh : public Drawable {
         static Mesh * loadFile(const char * file);
 
         // centered at origin from -0.5 to 0.5
-        static Mesh * createUnitCube(Texture * tex);
+        static Mesh * createUnitCube(Vec3<float> color, Texture * tex);
         static Mesh * createUnitCube(Vec3<float> color);
 
         // centered at origin with radius 0.5, z from -0.5 to 0.5
-        static Mesh * createUnitCylinder(Texture * tex, int numSides);
+        static Mesh * createUnitCylinder(Vec3<float> color, Texture * tex,
+            int numSides);
         static Mesh * createUnitCylinder(Vec3<float> color, int numSides);
 
         // centered at origin from -0.5 to 0.5, z=0
-        static Mesh * createUnitPlane(Texture * tex);
+        static Mesh * createUnitPlane(Vec3<float> color, Texture * tex);
         static Mesh * createUnitPlane(Vec3<float> color);
+
+        // recalculate normals
+        void calculateNormals(MeshCalculations::CalcNormalMethod mode);
 
         void superHappyFunTime();
 

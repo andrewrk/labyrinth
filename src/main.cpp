@@ -42,6 +42,10 @@ enum MenuItem {
     MenuFiltering,
         MenuFilteringSimple,
         MenuFilteringSmooth,
+    MenuNormals,
+        MenuNormalsPerFace,
+        MenuNormalsPerVertexAvg,
+        MenuNormalsPerVertexWeightedAvg,
     MenuQuit
 };
 
@@ -95,6 +99,7 @@ void menu(int value);
 void initMenus();
 void victory();
 void refreshLists();
+void setNormalMode(Mesh::CalcNormalMethod mode);
 
 Maze * maze;
 MazeView * mazeView;
@@ -124,6 +129,7 @@ int menuAnimateSpeedId;
 int menuMiniMapId;
 int menuTexturingId;
 int menuFilteringId;
+int menuNormalsId;
 
 // milliseconds in between frames 
 const int frameDelay = 16;
@@ -157,6 +163,7 @@ const GLfloat SpecRef[]       = { 0.7f, 0.7f, 0.7f, 1.0f };
 const GLubyte Shine = 128;
 
 vector<Drawable *> drawables;
+vector<MeshCalculations *> meshCalcs;
 
 Vec3<float> sectorSize;
 
@@ -276,6 +283,11 @@ void init() {
     drawables.push_back(mazeView);
     drawables.push_back(stillPerson);
     drawables.push_back(orbitingPerson);
+    drawables.push_back(orb2);
+
+    meshCalcs.push_back(person);
+    meshCalcs.push_back(lady);
+    meshCalcs.push_back(mazeView);
 
     moveMode = PlayMode;
     gameState = PreGame;
@@ -320,6 +332,12 @@ void initMenus() {
     glutAddMenuEntry("Simple", MenuFilteringSimple);
     glutAddMenuEntry("Smooth", MenuFilteringSmooth);
 
+    menuNormalsId = glutCreateMenu(menu);
+    glutAddMenuEntry("Per Surface", MenuNormalsPerFace);
+    glutAddMenuEntry("Per Vertex - Average", MenuNormalsPerVertexAvg);
+    glutAddMenuEntry("Per Vertex - Weighted Average",
+        MenuNormalsPerVertexWeightedAvg);
+
     menuId = glutCreateMenu(menu);
     glutAddSubMenu("Use glLists", menuUseGlListsId);
     glutAddSubMenu("Shade model", menuShadeModelId);
@@ -328,6 +346,7 @@ void initMenus() {
     glutAddSubMenu("Mini map", menuMiniMapId);
     glutAddSubMenu("Texturing", menuTexturingId);
     glutAddSubMenu("Filtering", menuFilteringId);
+    glutAddSubMenu("Normals", menuNormalsId);
     glutAddMenuEntry("Quit", MenuQuit);
 
     glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -338,6 +357,13 @@ void setListRendering(bool value){
     for(unsigned int i=0; i<drawables.size(); ++i){
         drawables[i]->setListRendering(value);
     }
+}
+
+void setNormalMode(MeshCalculations::CalcNormalMethod mode) {
+    for(unsigned int i=0; i<meshCalcs.size(); ++i){
+        meshCalcs[i]->calculateNormals(mode);
+    }
+    refreshLists();
 }
 
 void refreshLists(){
@@ -403,6 +429,15 @@ void menu(int value) {
         case MenuFilteringSmooth:
             Texture::setFilterMode(Texture::FilterModeSmooth);
             refreshLists();
+            break;
+        case MenuNormalsPerFace:
+            setNormalMode(Mesh::Surface);
+            break;
+        case MenuNormalsPerVertexAvg:
+            setNormalMode(Mesh::Average);
+            break;
+        case MenuNormalsPerVertexWeightedAvg:
+            setNormalMode(Mesh::WeightedAverage);
             break;
         case MenuQuit:
             quitApp();

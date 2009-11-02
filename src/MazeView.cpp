@@ -38,7 +38,8 @@ MazeView::MazeView(const Maze &maze, const Vec3<float> &pos,
     m_meshFloor(NULL),
     m_meshStartFloor(NULL),
     m_meshFinishFloor(NULL),
-    m_drawables()
+    m_drawables(),
+    m_meshes()
 {
     m_sectorSize.x = size.x / (float)maze.width();
     m_sectorSize.y = size.y / (float)maze.height();
@@ -65,19 +66,34 @@ void MazeView::createDrawables() {
     Bitmap * wallTexBmp =
         new Bitmap(string(RESOURCE_DIR "/textures/brick.bmp"));
     Texture * wallTexture = new Texture(wallTexBmp);
-    m_meshWallVert = Mesh::createUnitCube(wallTexture);
-    m_meshWallHoriz = m_meshWallVert;
+    m_meshWallVert = Mesh::createUnitCube(Vec3<float>(0.4, 0.4, 0.1),
+        wallTexture);
+    m_meshWallHoriz = Mesh::createUnitCube(Vec3<float>(0.8, 0.6, 0.1),
+        wallTexture);
 
     // create a post
-    //m_meshPost = Mesh::createUnitCylinder(Vec3<float>(0.59, 0.65, 0.74), 20);
-    m_meshPost = Mesh::createUnitCylinder(new Texture(
-        new Bitmap(string(RESOURCE_DIR "/textures/wood.bmp"))), 20);
+    m_meshPost = Mesh::createUnitCylinder(
+        Vec3<float>(0.59, 0.65, 0.74),
+        new Texture( new Bitmap(string(RESOURCE_DIR "/textures/wood.bmp"))),
+        20
+    );
 
     // create floor planes
-    m_meshFloor = Mesh::createUnitPlane( new Texture(
-        new Bitmap(string(RESOURCE_DIR "/textures/marble.bmp"))));
-    m_meshStartFloor = m_meshFloor;
-    m_meshFinishFloor = m_meshFloor;
+    Texture * floorTex = new Texture(new Bitmap(
+        string(RESOURCE_DIR "/textures/marble.bmp")));
+    m_meshFloor = Mesh::createUnitPlane(Vec3<float>(0.1, 0.1, 0.5), floorTex);
+    m_meshStartFloor = Mesh::createUnitPlane(Vec3<float>(0.2, 0.8, 0.2),
+        floorTex);
+    m_meshFinishFloor = Mesh::createUnitPlane(Vec3<float>(0.84, 0.12, 0.12),
+        floorTex);
+
+    m_meshes.clear();
+    m_meshes.push_back(m_meshWallVert);
+    m_meshes.push_back(m_meshWallHoriz);
+    m_meshes.push_back(m_meshPost);
+    m_meshes.push_back(m_meshFloor);
+    m_meshes.push_back(m_meshStartFloor);
+    m_meshes.push_back(m_meshFinishFloor);
 
     // ----- create mesh instances ------
     int x,y;
@@ -320,5 +336,11 @@ void MazeView::setHappyColoring(bool value) {
 void MazeView::setListRendering(bool value) {
     for(unsigned int i=0; i<m_drawables.size(); ++i) {
         m_drawables[i]->setListRendering(value);
+    }
+}
+
+void MazeView::calculateNormals(MeshCalculations::CalcNormalMethod mode) {
+    for(unsigned int i=0; i<m_meshes.size(); ++i) {
+        m_meshes[i]->calculateNormals(mode);
     }
 }

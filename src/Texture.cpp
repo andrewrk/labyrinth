@@ -27,9 +27,6 @@ Texture::Texture(Bitmap * bmp)
         GL_UNSIGNED_BYTE,
         bmp->buffer()
     );
-
-
-
 }
 
 Texture::~Texture() {

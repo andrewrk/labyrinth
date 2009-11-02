@@ -12,16 +12,23 @@ class Texture {
             ModeOff
         };
 
+        enum FilterMode {
+            FilterModeSimple,
+            FilterModeSmooth
+        };
+
         Texture(Bitmap * bitmap);
         ~Texture();
 
         static void setMode(Mode mode);
+        static void setFilterMode(FilterMode mode);
 
         inline Bitmap * bitmap() { return m_bmp; }
         void bind();
     private:
         Bitmap * m_bmp;
         unsigned int m_id;
+
         static Mode s_mode;
 };
 

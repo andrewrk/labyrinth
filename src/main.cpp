@@ -39,6 +39,9 @@ enum MenuItem {
         MenuTexturingReplace,
         MenuTexturingBlend,
         MenuTexturingOff,
+    MenuFiltering,
+        MenuFilteringSimple,
+        MenuFilteringSmooth,
     MenuQuit
 };
 
@@ -120,6 +123,7 @@ int menuGameModeId;
 int menuAnimateSpeedId;
 int menuMiniMapId;
 int menuTexturingId;
+int menuFilteringId;
 
 // milliseconds in between frames 
 const int frameDelay = 16;
@@ -234,6 +238,7 @@ void init() {
     glMaterialfv(GL_FRONT, GL_SPECULAR, SpecRef);
     glMateriali(GL_FRONT, GL_SHININESS, Shine);
     glEnable(GL_NORMALIZE);
+    Texture::setFilterMode(Texture::FilterModeSimple);
 
     glutIgnoreKeyRepeat(true);
 
@@ -311,6 +316,10 @@ void initMenus() {
     glutAddMenuEntry("Blend", MenuTexturingBlend);
     glutAddMenuEntry("Off", MenuTexturingOff);
 
+    menuFilteringId = glutCreateMenu(menu);
+    glutAddMenuEntry("Simple", MenuFilteringSimple);
+    glutAddMenuEntry("Smooth", MenuFilteringSmooth);
+
     menuId = glutCreateMenu(menu);
     glutAddSubMenu("Use glLists", menuUseGlListsId);
     glutAddSubMenu("Shade model", menuShadeModelId);
@@ -318,6 +327,7 @@ void initMenus() {
     glutAddSubMenu("Animation speed", menuAnimateSpeedId);
     glutAddSubMenu("Mini map", menuMiniMapId);
     glutAddSubMenu("Texturing", menuTexturingId);
+    glutAddSubMenu("Filtering", menuFilteringId);
     glutAddMenuEntry("Quit", MenuQuit);
 
     glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -384,6 +394,14 @@ void menu(int value) {
             break;
         case MenuTexturingOff:
             Texture::setMode(Texture::ModeOff);
+            refreshLists();
+            break;
+        case MenuFilteringSimple:
+            Texture::setFilterMode(Texture::FilterModeSimple);
+            refreshLists();
+            break;
+        case MenuFilteringSmooth:
+            Texture::setFilterMode(Texture::FilterModeSmooth);
             refreshLists();
             break;
         case MenuQuit:

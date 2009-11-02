@@ -1,5 +1,8 @@
 #include "Texture.h"
 
+#include <cmath>
+using namespace std;
+
 #include "Bitmap.h"
 
 #include "GL/freeglut.h"
@@ -13,19 +16,18 @@ Texture::Texture(Bitmap * bmp)
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, m_id);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(
+    setFilterMode(FilterModeSimple);
+    // create mipmaps
+    gluBuild2DMipmaps(
         GL_TEXTURE_2D,
-        0,
-        GL_RGBA,
+        GL_RGBA, 
         bmp->info()->bmiHeader.biWidth,
         bmp->info()->bmiHeader.biHeight,
-        0,
         GL_RGB,
         GL_UNSIGNED_BYTE,
         bmp->buffer()
     );
+
 
 
 }
@@ -57,3 +59,16 @@ void Texture::setMode(Mode mode) {
     s_mode = mode;
 }
 
+void Texture::setFilterMode(FilterMode mode){
+    switch(mode){
+        case FilterModeSimple:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            break;
+        case FilterModeSmooth:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                GL_LINEAR_MIPMAP_LINEAR);
+            break;
+    }
+}

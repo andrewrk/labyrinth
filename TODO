@@ -1,11 +1,4 @@
 Version 0.2.0 (Project 2)
- * filtering
-    - filtering - simple
-        > Minification - simple (nearest neighbor)
-        > Magnification - simple (nearest neighbor)
-    - filtering - smooth
-        > Minification - use mip maps
-        > magnification - select the "smoothest" option
  * normals -> per face normals - renders the scene using all per face normals
  * normals -> per vertex normals - renders the scene using all per vertex
    normals

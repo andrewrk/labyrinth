@@ -115,6 +115,8 @@ void refreshLists();
 void setNormalMode(Mesh::CalcNormalMethod mode);
 void setNormalArrows(bool value);
 
+void moveLight(float x, float y, float z);
+
 Maze * maze;
 MazeView * mazeView;
 Camera * camera;
@@ -175,6 +177,7 @@ int gameState;
 const GLfloat goodAmbientLight[]  = { 0.3f, 0.3f, 0.3f, 1.0f };
 const GLfloat goodDiffuseLight[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat goodSpecLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat noLight[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 const GLubyte shininess = 128;
 
 vector<Drawable *> drawables;
@@ -197,6 +200,8 @@ bool showNormalArrows = false;
 
 bool usingTextures = true;
 bool usingListRendering = true;
+
+float lightPos[4];
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -288,12 +293,12 @@ void init() {
 
     // lighting
     glEnable(GL_LIGHTING);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, goodAmbientLight);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, goodDiffuseLight);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, goodSpecLight);
     glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_NORMALIZE);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, noLight);
+    //glLightfv(GL_LIGHT0, GL_DIFFUSE, noLight);
+    //glLightfv(GL_LIGHT0, GL_SPECULAR, noLight);
     Texture::setFilterMode(Texture::FilterModeSimple);
     setMaterial(MaterialDiffuse);
 
@@ -314,6 +319,12 @@ void init() {
     mazeView = new MazeView(*maze, Vec3<float>(0, 0, 0),
         Vec3<float>(200,200,10), startX, startY, finishX, finishY, reqX, reqY);
     sectorSize = mazeView->sectorSize();
+
+    moveLight(
+        sectorSize.x * ((float)maze->width() / 2.0f),
+        sectorSize.y * ((float)maze->height() / 2.0f),
+        50.0f
+    );
 
     // load meshes
     person = Mesh::loadFile(RESOURCE_DIR "/obj/lady.obj");
@@ -349,6 +360,17 @@ void init() {
 
     setListRendering(true);
     activateWindow();
+}
+
+void moveLight(Vec3<float> new_pos) {
+    glPushMatrix();
+        glLoadIdentity();
+        lightPos[0] = new_pos.x;
+        lightPos[1] = new_pos.y;
+        lightPos[2] = new_pos.z;
+        lightPos[3] = 0.0f;
+        glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+    glPopMatrix();
 }
 
 void initMenus() {

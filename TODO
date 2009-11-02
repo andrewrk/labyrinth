@@ -1,15 +1,4 @@
 Version 0.2.0 (Project 2)
- * shading
-    - scene has one single light source (the sun).
-        > above but near the edges
-        > no attenuation
-    - material options:
-        > materials -> diffuse - everything is rendered with same material
-          that has a high diffuse and a low emissive component.
-        > materials -> specular - everything is rendered with a material that
-          has a high specular, high diffuse, and low emissive component
-        > materials -> Design - assign different materials to different things
-          to make the scene look good
  * ability to move the light source around in realtime
     - left click / right click - rotate the light source around the scene about
       the Y axis

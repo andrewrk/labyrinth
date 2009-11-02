@@ -216,12 +216,12 @@ int main(int argc, char *argv[]) {
     string rcfile = ".";
     rcfile = rcfile + PROGRAM_NAME + "rc";
 
-    keyActions[ActionMoveForward] = ',';
+    keyActions[ActionMoveForward] = 'w';
     keyActions[ActionStrafeLeft] = 'a';
-    keyActions[ActionMoveBackward] = 'o';
-    keyActions[ActionStrafeRight] = 'e';
-    keyActions[ActionRotateSunCW] = 'l';
-    keyActions[ActionRotateSunCCW] = 'r';
+    keyActions[ActionMoveBackward] = 's';
+    keyActions[ActionStrafeRight] = 'd';
+    keyActions[ActionRotateSunCW] = 'p';
+    keyActions[ActionRotateSunCCW] = 'o';
 
     glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(formWidth, formHeight);

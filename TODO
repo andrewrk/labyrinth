@@ -3,11 +3,11 @@ Version 0.2.0 (Project 2)
     - menu option: crease angle -> 15, 25, 35, Off
     - normals only get averaged at a vertex when the angles between the 
       adjacent triangles is less than then crease angle.
- * change back to qwerty
  * fix texture coordinates for walls and cylinders
  * bug: the dude is red and there is a line going from the girl to him
  * bug: the animation stopped
  * bug: surface normals not unified
+ * bug: weighted average is dubious
 
 Version 0.2.1
  * MazeView - keep track of textures and delete them when done (memory leak)

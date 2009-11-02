@@ -458,10 +458,61 @@ void Mesh::calculateNormals(MeshCalculations::CalcNormalMethod mode) {
 
             break;
         case Average:
-
-            break;
         case WeightedAverage:
+            if( mode == MeshCalculations::Average ) {
+                calculateNormals(MeshCalculations::Surface);
+            } else {
+                m_normals.clear();
+                m_normalIndices.clear();
+                for (unsigned int f = 0; f < m_vertexIndices.size(); f += 3) {
+                    for (int v = 0; v < 3; v++) {
+                        Vec3<float> vertex = m_vertices[m_vertexIndices[f + v]];
+                        Vec3<float> right =
+                            m_vertices[m_vertexIndices[f + (v + 1) % 3]];
+                        Vec3<float> left =
+                            m_vertices[m_vertexIndices[f + (v + 2) % 3]];
+                        Vec3<float> normal =
+                            (right - vertex).cross(left - vertex);
 
+                        m_normals.push_back(normal);
+                        m_normalIndices.push_back(f);
+                    }
+                }
+            }
+
+            // init
+            vector<vector<int>*> vertexToFace;
+            for (unsigned int i = 0; i < m_vertices.size(); i++)
+                vertexToFace.push_back(new vector<int>());
+
+            // map vertices to faces
+            for (unsigned int f = 0; f < m_vertexIndices.size(); f += 3)
+                for (int v = 0; v < 3; v++)
+                    vertexToFace[m_vertexIndices[f + v]]->push_back(f);
+
+            // calc new m_normals
+            vector< Vec3<float> > newm_normals;
+            for (unsigned int v = 0; v < vertexToFace.size(); v++) {
+                vector<int> * faces = vertexToFace[v];
+                Vec3<float> normal(0.0f);
+                for (unsigned int f = 0; f < faces->size(); f++)
+                    normal += m_normals[m_normalIndices[(*faces)[f]]];
+                normal.normalize();
+                newm_normals.push_back(normal);
+            }
+
+            // use new m_normals
+            m_normals.clear();
+            for (unsigned int i = 0; i < newm_normals.size(); i++)
+                m_normals.push_back(newm_normals[i]);
+            m_normalIndices.clear();
+            for (unsigned int i = 0; i < m_vertexIndices.size(); i++)
+                m_normalIndices.push_back(m_vertexIndices[i]);
+
+            // cleanup
+            for (unsigned int i = 0; i < vertexToFace.size(); i++)
+                delete vertexToFace[i];
+            
             break;
     }
 }
@@ -473,7 +524,8 @@ void Mesh::setShowNormals(bool value) {
 void Mesh::drawNormalArrows(Vec3<float> scale) {
     if( ! m_showNormals ) return;
 
-    const float normalLength = 2.0f;
+    const float normalLength = 1.0f;
+    glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 0.0f, 0.0f);
     glBegin(GL_LINES);
         switch(m_normalMode){
@@ -495,9 +547,15 @@ void Mesh::drawNormalArrows(Vec3<float> scale) {
                 }
                 break;
             case MeshCalculations::Average:
-                break;
             case MeshCalculations::WeightedAverage:
-                
+                for( unsigned int i = 0; i < m_normalIndices.size(); ++i){
+                    Vec3<float> v = m_vertices[m_vertexIndices[i]];
+                    glVertex3f(v.x, v.y, v.z);
+                    Vec3<float> normal = m_normals[m_normalIndices[i]];
+                    normal /= scale;
+                    v += normalLength * normal;
+                    glVertex3f(v.x, v.y, v.z);
+                }
                 break;
         }
     glEnd();

@@ -1,8 +1,4 @@
 Version 0.2.0 (Project 2)
- * normals -> per vertex normals - renders the scene using all per vertex
-   normals
-    - Normals -> per vertex normals - calculate using average
-    - normals -> per vertex normals weighted - calculate using weighted average
  * crease angles
     - menu option: crease angle -> 15, 25, 35, Off
     - normals only get averaged at a vertex when the angles between the 
@@ -31,6 +27,9 @@ Version 0.2.0 (Project 2)
     - a and s control elevation over the ground plane 
  * change back to qwerty
  * fix texture coordinates for walls and cylinders
+ * bug: the dude is red and there is a line going from the girl to him
+ * bug: the animation stopped
+ * bug: surface normals not unified
 
 Version 0.2.1
  * MazeView - keep track of textures and delete them when done (memory leak)

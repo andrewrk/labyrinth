@@ -1,12 +1,7 @@
 Version 0.2.0 (Project 2)
- * crease angles
-    - menu option: crease angle -> 15, 25, 35, Off
-    - normals only get averaged at a vertex when the angles between the 
-      adjacent triangles is less than then crease angle.
  * shading
     - scene has one single light source (the sun).
         > above but near the edges
-        > color has diffuse and specular components 1,1,1
         > no attenuation
     - material options:
         > materials -> diffuse - everything is rendered with same material
@@ -18,6 +13,10 @@ Version 0.2.0 (Project 2)
  * ability to move the light source around in realtime
     - left click / right click - rotate the light source around the scene about
       the Y axis
+ * crease angles
+    - menu option: crease angle -> 15, 25, 35, Off
+    - normals only get averaged at a vertex when the angles between the 
+      adjacent triangles is less than then crease angle.
  * change back to qwerty
  * fix texture coordinates for walls and cylinders
  * bug: the dude is red and there is a line going from the girl to him

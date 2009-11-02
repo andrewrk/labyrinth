@@ -162,7 +162,7 @@ int countDownLeft; // seconds till game starts
 int gameState;
 
 const GLfloat AmbientLight[]  = { 0.3f, 0.3f, 0.3f, 1.0f };
-const GLfloat DiffuseLight[]  = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat DiffuseLight[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat SpecularLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat SpecRef[]       = { 0.7f, 0.7f, 0.7f, 1.0f };
 const GLubyte Shine = 128;

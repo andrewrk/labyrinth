@@ -61,6 +61,8 @@ enum Actions {
     ActionMoveBackward,
     ActionStrafeLeft,
     ActionStrafeRight,
+    ActionRotateSunCW,
+    ActionRotateSunCCW,
 
     // the length of the enum
     NumActions
@@ -115,7 +117,7 @@ void refreshLists();
 void setNormalMode(Mesh::CalcNormalMethod mode);
 void setNormalArrows(bool value);
 
-void moveLight(float x, float y, float z);
+void moveLight(Vec3<float> pos);
 
 Maze * maze;
 MazeView * mazeView;
@@ -203,6 +205,10 @@ bool usingListRendering = true;
 
 float lightPos[4];
 
+Vec3<float> sunPos;
+float sunAngle = M_PI;
+float sunRadius = 50.0f;
+
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
 
@@ -214,6 +220,8 @@ int main(int argc, char *argv[]) {
     keyActions[ActionStrafeLeft] = 'a';
     keyActions[ActionMoveBackward] = 'o';
     keyActions[ActionStrafeRight] = 'e';
+    keyActions[ActionRotateSunCW] = 'l';
+    keyActions[ActionRotateSunCCW] = 'r';
 
     glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(formWidth, formHeight);
@@ -320,11 +328,9 @@ void init() {
         Vec3<float>(200,200,10), startX, startY, finishX, finishY, reqX, reqY);
     sectorSize = mazeView->sectorSize();
 
-    moveLight(
-        sectorSize.x * ((float)maze->width() / 2.0f),
-        sectorSize.y * ((float)maze->height() / 2.0f),
-        50.0f
-    );
+    sunPos = Vec3<float>(sectorSize.x * ((float)maze->width() / 2.0f),
+        sectorSize.y * ((float)maze->height() / 2.0f), 0.0f);
+    moveLight(Vec3<float>(sunPos.x, sunPos.y, sunRadius));
 
     // load meshes
     person = Mesh::loadFile(RESOURCE_DIR "/obj/lady.obj");
@@ -363,6 +369,7 @@ void init() {
 }
 
 void moveLight(Vec3<float> new_pos) {
+    cout << "move light to " << new_pos << endl;
     glPushMatrix();
         glLoadIdentity();
         lightPos[0] = new_pos.x;
@@ -770,6 +777,11 @@ void nextFrame(int value) {
                              center2.y+orbit2Radius*cosf(orbit2Angle),
                              center2.z+orbit2Radius*sinf(orbit2Angle)));
 
+    if( keyState[keyActions[ActionRotateSunCW]] || keyState[keyActions[ActionRotateSunCCW]] ){
+        float delta = keyState[ActionRotateSunCW] ? 0.1 : -0.1;
+        sunAngle += delta;
+        moveLight(Vec3<float>(sunPos.x+cosf(sunAngle)*sunRadius, sunPos.y, sunPos.z+sinf(sunAngle)));
+    }
     switch(gameState) {
         case PreGame:
             // countdown timer
@@ -846,6 +858,7 @@ void nextFrame(int value) {
                     camera->moveRight(0.7 * fpsRate);
                 }
             }
+
 
             if( gameState == GamePlay ) { 
                 Vec2<int> coord = mazeView->coordinates(playerPos);

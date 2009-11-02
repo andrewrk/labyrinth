@@ -1,7 +1,4 @@
 Version 0.2.0 (Project 2)
- * ability to move the light source around in realtime
-    - left click / right click - rotate the light source around the scene about
-      the Y axis
  * crease angles
     - menu option: crease angle -> 15, 25, 35, Off
     - normals only get averaged at a vertex when the angles between the 

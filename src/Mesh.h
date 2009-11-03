@@ -19,7 +19,8 @@ class MeshCalculations {
             WeightedAverage
         };
 
-        virtual void calculateNormals(CalcNormalMethod mode) = 0;
+        virtual void calculateNormals(CalcNormalMethod mode,
+            int creaseAngle) = 0;
         virtual void setShowNormals(bool value) = 0;
 };
 
@@ -47,7 +48,8 @@ class Mesh : public Drawable, public MeshCalculations {
         static Mesh * createUnitPlane(Vec3<float> color);
 
         // recalculate normals
-        void calculateNormals(MeshCalculations::CalcNormalMethod mode);
+        void calculateNormals(MeshCalculations::CalcNormalMethod mode,
+            int creaseAngle);
 
         // show/hide normal arrows
         void setShowNormals(bool value);

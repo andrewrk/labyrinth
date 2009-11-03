@@ -53,6 +53,11 @@ enum MenuItem {
         MenuMaterialDiffuse,
         MenuMaterialSpecular,
         MenuMaterialDesign,
+    MenuCrease,
+        MenuCreaseOff,
+        MenuCrease15,
+        MenuCrease25,
+        MenuCrease35,
     MenuQuit
 };
 
@@ -116,7 +121,7 @@ void victory();
 void refreshLists();
 void setNormalMode(Mesh::CalcNormalMethod mode);
 void setNormalArrows(bool value);
-
+void setCreaseAngle(int degrees);
 void moveLight(Vec3<float> pos);
 
 Maze * maze;
@@ -150,6 +155,7 @@ int menuFilteringId;
 int menuNormalsId;
 int menuNormalArrowsId;
 int menuMaterialId;
+int menuCreaseId;
 
 // milliseconds in between frames 
 const int frameDelay = 16;
@@ -208,6 +214,9 @@ float lightPos[4];
 Vec3<float> sunPos;
 float sunAngle = M_PI;
 float sunRadius = 50.0f;
+
+int creaseAngle = 0;
+MeshCalculations::CalcNormalMethod normalMethod;
 
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
@@ -287,6 +296,14 @@ void setMaterial(int material) {
             glMaterialfv(GL_FRONT, GL_DIFFUSE, design_diffuse);
             break;
     }
+}
+
+void setCreaseAngle(int degrees) {
+    creaseAngle = degrees;
+    for(unsigned int i=0; i<meshCalcs.size(); ++i){
+        meshCalcs[i]->calculateNormals(normalMethod, creaseAngle);
+    }
+    refreshLists();
 }
 
 void init() {
@@ -425,6 +442,12 @@ void initMenus() {
     glutAddMenuEntry("Specular", MenuMaterialSpecular);
     glutAddMenuEntry("Design", MenuMaterialDesign);
 
+    menuCreaseId = glutCreateMenu(menu);
+    glutAddMenuEntry("Off", MenuCreaseOff);
+    glutAddMenuEntry("15 degrees", MenuCrease15);
+    glutAddMenuEntry("25 degrees", MenuCrease25);
+    glutAddMenuEntry("35 degrees", MenuCrease35);
+
     menuId = glutCreateMenu(menu);
     glutAddSubMenu("Use glLists", menuUseGlListsId);
     glutAddSubMenu("Shade model", menuShadeModelId);
@@ -436,6 +459,7 @@ void initMenus() {
     glutAddSubMenu("Normals", menuNormalsId);
     glutAddSubMenu("Normal Visualization", menuNormalArrowsId);
     glutAddSubMenu("Material", menuMaterialId);
+    glutAddSubMenu("Crease", menuCreaseId);
     glutAddMenuEntry("Quit", MenuQuit);
 
     glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -449,8 +473,9 @@ void setListRendering(bool value){
 }
 
 void setNormalMode(MeshCalculations::CalcNormalMethod mode) {
+    normalMethod = mode;
     for(unsigned int i=0; i<meshCalcs.size(); ++i){
-        meshCalcs[i]->calculateNormals(mode);
+        meshCalcs[i]->calculateNormals(mode, creaseAngle);
     }
     refreshLists();
 }
@@ -550,6 +575,18 @@ void menu(int value) {
             break;
         case MenuMaterialDesign:
             setMaterial(MaterialDesign);
+            break;
+        case MenuCreaseOff:
+            setCreaseAngle(0);
+            break;
+        case MenuCrease15:
+            setCreaseAngle(15);
+            break;
+        case MenuCrease25:
+            setCreaseAngle(25);
+            break;
+        case MenuCrease35:
+            setCreaseAngle(35);
             break;
         case MenuQuit:
             quitApp();

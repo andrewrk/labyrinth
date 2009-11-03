@@ -43,7 +43,7 @@ class MazeView : public Drawable, public MeshCalculations {
         void setHappyColoring(bool value);
 
         void setListRendering(bool value);
-        void calculateNormals(CalcNormalMethod mode);
+        void calculateNormals(CalcNormalMethod mode, int creaseAngle);
 
         
         void setShowNormals(bool value);

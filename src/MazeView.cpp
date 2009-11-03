@@ -339,9 +339,11 @@ void MazeView::setListRendering(bool value) {
     }
 }
 
-void MazeView::calculateNormals(MeshCalculations::CalcNormalMethod mode) {
+void MazeView::calculateNormals(MeshCalculations::CalcNormalMethod mode,
+    int creaseAngle)
+{
     for(unsigned int i=0; i<m_meshes.size(); ++i) {
-        m_meshes[i]->calculateNormals(mode);
+        m_meshes[i]->calculateNormals(mode, creaseAngle);
     }
 }
 

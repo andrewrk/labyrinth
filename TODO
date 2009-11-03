@@ -1,11 +1,9 @@
-Version 0.2.0 (Project 2)
+Version 0.2.1 (Project 2)
  * crease angles
     - menu option: crease angle -> 15, 25, 35, Off
     - normals only get averaged at a vertex when the angles between the 
       adjacent triangles is less than then crease angle.
- * bug: the dude is red and there is a line going from the girl to him
- * bug: the animation stopped
- * bug: surface normals not unified
+ * bug: the animation stopped - problem with gl lists
 
 Version 0.2.1
  * MazeView - keep track of textures and delete them when done (memory leak)

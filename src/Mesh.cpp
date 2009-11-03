@@ -451,7 +451,9 @@ void Mesh::calculatePerSurface(bool normalize){
     }
 }
 
-void Mesh::calculateNormals(MeshCalculations::CalcNormalMethod mode) {
+void Mesh::calculateNormals(MeshCalculations::CalcNormalMethod mode,
+    int creaseAngle)
+{
     m_normalMode = mode;
 
     switch(mode) {

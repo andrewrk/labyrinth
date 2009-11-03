@@ -15,13 +15,13 @@ class Bitmap {
         inline int height() { return m_info->bmiHeader.biHeight; }
 
     private:
-        static const short int BF_TYPE;
+        static const short int WIN_BF_TYPE;
 
         enum BitmapCompression {
-            BI_RGB,                  /* No compression - straight BGR data */
-            BI_RLE8,                 /* 8-bit run-length compression */
-            BI_RLE4,                 /* 4-bit run-length compression */
-            BI_BITFIELDS             /* RGB bitmap with RGB masks */
+            WIN_BI_RGB,                /* No compression - straight BGR data */
+            WIN_BI_RLE8,               /* 8-bit run-length compression */
+            WIN_BI_RLE4,               /* 4-bit run-length compression */
+            WIN_BI_BITFIELDS           /* RGB bitmap with RGB masks */
         };
 
 

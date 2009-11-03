@@ -5,7 +5,7 @@
 #include <cerrno>
 using namespace std;
 
-const short int Bitmap::BF_TYPE = 0x4D42;
+const short int Bitmap::WIN_BF_TYPE = 0x4D42;
 
 Bitmap::Bitmap(string file) :
     m_bits(NULL),
@@ -47,7 +47,7 @@ unsigned char * Bitmap::LoadDIBitmap(const char *filename, WIN_BITMAPINFO **info
     header.bfReserved2 = read_word(fp);
     header.bfOffBits   = read_dword(fp);
 
-    if (header.bfType != BF_TYPE) /* Check for BM reversed... */
+    if (header.bfType != WIN_BF_TYPE) /* Check for BM reversed... */
     {
         /* Not a bitmap file - return NULL... */
         fclose(fp);
@@ -157,16 +157,16 @@ int Bitmap::SaveDIBitmap(const char *filename, /* I - File to load */
     infosize = sizeof(WIN_BITMAPINFOHEADER);
     switch (info->bmiHeader.biCompression)
     {
-        case BI_BITFIELDS :
+        case WIN_BI_BITFIELDS :
             infosize += 12; /* Add 3 RGB doubleword masks */
             if (info->bmiHeader.biClrUsed == 0)
                 break;
-        case BI_RGB :
+        case WIN_BI_RGB :
             if (info->bmiHeader.biBitCount > 8 &&
                     info->bmiHeader.biClrUsed == 0)
                 break;
-        case BI_RLE8 :
-        case BI_RLE4 :
+        case WIN_BI_RLE8 :
+        case WIN_BI_RLE4 :
             if (info->bmiHeader.biClrUsed == 0)
                 infosize += (1 << info->bmiHeader.biBitCount) * 4;
             else
@@ -177,7 +177,7 @@ int Bitmap::SaveDIBitmap(const char *filename, /* I - File to load */
     size = sizeof(WIN_BITMAPFILEHEADER) + infosize + bitsize;
 
     /* Write the file header, bitmap information, and bitmap pixel data... */
-    write_word(fp, BF_TYPE);        /* bfType */
+    write_word(fp, WIN_BF_TYPE);        /* bfType */
     write_dword(fp, size);          /* bfSize */
     write_word(fp, 0);              /* bfReserved1 */
     write_word(fp, 0);              /* bfReserved2 */

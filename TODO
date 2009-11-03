@@ -1,8 +1,6 @@
-Version 0.2.1 (Project 2)
+Version 0.2.4
  * bug: the animation stopped - problem with gl lists
  * bug: crease angles don't actually work
  * bug: materials don't work. nothing works. it's all broken. and when I click
    live view, it crashes.
-
-Version 0.2.1
  * MazeView - keep track of textures and delete them when done (memory leak)

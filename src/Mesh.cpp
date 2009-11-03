@@ -428,55 +428,39 @@ void Mesh::superHappyFunTime() {
     m_haveColors = true;
 }
 
-void Mesh::calculateNormals(MeshCalculations::CalcNormalMethod mode) {
-    m_normalMode = mode;
-
+void Mesh::calculatePerSurface(bool normalize){
     int index = 0;
     m_normals.clear();
     m_normalIndices.clear();
+    for(unsigned int i=0; i<m_vertexIndices.size(); i+=3){
+        // make two edge vectors
+        Vec3<float> edge1 = m_vertices[m_vertexIndices[i]]
+            - m_vertices[m_vertexIndices[i+1]];
+        Vec3<float> edge2 = m_vertices[m_vertexIndices[i+1]]
+            - m_vertices[m_vertexIndices[i+2]];
+            
+        // cross product is normal
+        m_normals.push_back(edge1.cross(edge2));
+        if( normalize ) m_normals[m_normals.size()-1].normalize();
+
+        m_normalIndices.push_back(index);
+        m_normalIndices.push_back(index);
+        m_normalIndices.push_back(index);
+        
+        ++index;
+    }
+}
+
+void Mesh::calculateNormals(MeshCalculations::CalcNormalMethod mode) {
+    m_normalMode = mode;
+
     switch(mode) {
         case Surface:
-            for(unsigned int i=0; i<m_vertexIndices.size(); i+=3){
-                // make two edge vectors
-                Vec3<float> edge1 = m_vertices[m_vertexIndices[i]]
-                    - m_vertices[m_vertexIndices[i+1]];
-                Vec3<float> edge2 = m_vertices[m_vertexIndices[i]]
-                    - m_vertices[m_vertexIndices[i+2]];
-                    
-                // cross product is normal
-                m_normals.push_back(edge1.cross(edge2));
-
-                m_normalIndices.push_back(index);
-                m_normalIndices.push_back(index);
-                m_normalIndices.push_back(index);
-                
-                ++index;
-            }
-
+            calculatePerSurface(true);
             break;
         case Average:
         case WeightedAverage:
-            if( mode == MeshCalculations::Average ) {
-                calculateNormals(MeshCalculations::Surface);
-            } else {
-                m_normals.clear();
-                m_normalIndices.clear();
-                for (unsigned int f = 0; f < m_vertexIndices.size(); f += 3) {
-                    for (int v = 0; v < 3; v++) {
-                        Vec3<float> vertex = m_vertices[m_vertexIndices[f + v]];
-                        Vec3<float> right =
-                            m_vertices[m_vertexIndices[f + (v + 1) % 3]];
-                        Vec3<float> left =
-                            m_vertices[m_vertexIndices[f + (v + 2) % 3]];
-                        Vec3<float> normal =
-                            (right - vertex).cross(left - vertex);
-
-                        m_normals.push_back(normal);
-                        m_normalIndices.push_back(f);
-                    }
-                }
-            }
-
+            calculatePerSurface(mode == MeshCalculations::Average);
             // init
             vector<vector<int>*> vertexToFace;
             for (unsigned int i = 0; i < m_vertices.size(); i++)
@@ -537,7 +521,8 @@ void Mesh::drawNormalArrows(Vec3<float> scale) {
                     glVertex3f(vertex.x, vertex.y, vertex.z);
 
                     // add normal vector
-                    Vec3<float> normal = m_normals[m_normalIndices[f]];
+                    Vec3<float> normal =
+                        m_normals[m_normalIndices[f]].normalized();
                     normal /= scale;
                     vertex += normalLength * normal;
                     glVertex3f(vertex.x, vertex.y, vertex.z);

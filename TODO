@@ -6,7 +6,6 @@ Version 0.2.0 (Project 2)
  * bug: the dude is red and there is a line going from the girl to him
  * bug: the animation stopped
  * bug: surface normals not unified
- * bug: weighted average is dubious
 
 Version 0.2.1
  * MazeView - keep track of textures and delete them when done (memory leak)

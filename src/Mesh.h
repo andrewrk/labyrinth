@@ -94,6 +94,7 @@ class Mesh : public Drawable, public MeshCalculations {
             int v3, int v4);
         static void triangle(vector<int> & array, int v1, int v2,
             int v3);
+        void calculatePerSurface(bool normalize);
         
 };
 

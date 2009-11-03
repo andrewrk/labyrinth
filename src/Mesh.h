@@ -90,16 +90,10 @@ class Mesh : public Drawable, public MeshCalculations {
         static vector<string> split_string(const string& str,
             const string& split_str);
         static int StrToInt(const string &str);
-        static void quad(vector<int> & vertexIndices, int v1, int v2,
+        static void quad(vector<int> & array, int v1, int v2,
             int v3, int v4);
-        static void quad(vector<int> & vertexIndices,
-            vector<int> & normalIndices,
-            vector<int> & texCoordIndices, int v1, int v2, int v3, int v4);
-        static void triangle(vector<int> & vertexIndices, int v1, int v2,
+        static void triangle(vector<int> & array, int v1, int v2,
             int v3);
-        static void triangle(vector<int> & vertexIndices,
-            vector<int> & normalIndices,
-            vector<int> & texCoordIndices, int v1, int v2, int v3);
         
 };
 

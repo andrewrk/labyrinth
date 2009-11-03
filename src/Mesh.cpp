@@ -222,9 +222,6 @@ Mesh * Mesh::createUnitCylinder(Vec3<float> color, int numSides) {
     // vertices
     for (float side = -1.0; side <= 1.0; side += 2.0) {
         float z = 0.5 * side;
-        float texY = side + 1.0f;
-        if( texY > 1.0f ) texY = 1.0f;
-
         mesh->m_normals.push_back(Vec3<float>(0, 0, z*2));
         mesh->m_vertices.push_back(Vec3<float>(0.0f, 0.0f, z)); // center
         mesh->m_textureCoords.push_back(Vec2<float>(0.5f, 0.5f));
@@ -233,28 +230,49 @@ Mesh * Mesh::createUnitCylinder(Vec3<float> color, int numSides) {
             mesh->m_normals.push_back(Vec3<float>(cosf(angle), sinf(angle), 0));
             mesh->m_vertices.push_back(
                 Vec3<float>(cosf(angle) / 2.0f, sinf(angle) / 2.0f, z));
-            mesh->m_textureCoords.push_back(Vec2<float>(angle/(2*M_PI), texY));
+            mesh->m_textureCoords.push_back(Vec2<float>(0.5f+cosf(angle)/2.0f, 0.5f+sinf(angle) / 2.0f));
         }
     }
     // index caps
     for (int side = 0; side <= numSides + 1; side += numSides + 1) {
         for (int i = 0; i < numSides - 1; i++) {
-            triangle(mesh->m_vertexIndices, mesh->m_normalIndices,
-                mesh->m_textureCoordIndices, side, side + i + 1, side + i + 2);
+            triangle(mesh->m_vertexIndices, side, side + i + 1, side + i + 2);
+            triangle(mesh->m_normalIndices, side, side + i + 1, side + i + 2);
+            triangle(mesh->m_textureCoordIndices, side, side + i + 1,
+                side + i + 2);
         }
-        triangle(mesh->m_vertexIndices, mesh->m_normalIndices,
-            mesh->m_textureCoordIndices, side, side + numSides, side + 1);
+        triangle(mesh->m_vertexIndices, side, side + numSides, side + 1);
+        triangle(mesh->m_normalIndices, side, side + numSides, side + 1);
+        triangle(mesh->m_textureCoordIndices, side, side + numSides, side + 1);
     }
     // index sides
-    quad(mesh->m_vertexIndices, mesh->m_normalIndices,
-        mesh->m_textureCoordIndices, 1, numSides + 2, 2 * numSides + 1, 2);
+    quad(mesh->m_vertexIndices, 1, numSides + 2, 2 * numSides + 1, 2);
+    quad(mesh->m_normalIndices, 1, numSides + 2, 2 * numSides + 1, 2);
     for (int i = 1; i < numSides - 1; i++) {
-        quad(mesh->m_vertexIndices, mesh->m_normalIndices,
-            mesh->m_textureCoordIndices, i + 1, 2 * numSides + 2 - i,
+        quad(mesh->m_vertexIndices, i + 1, 2 * numSides + 2 - i,
+            2 * numSides + 2 - i - 1, i + 1 + 1);
+        quad(mesh->m_normalIndices, i + 1, 2 * numSides + 2 - i,
             2 * numSides + 2 - i - 1, i + 1 + 1);
     }
-    quad(mesh->m_vertexIndices, mesh->m_normalIndices,
-        mesh->m_textureCoordIndices, numSides, numSides + 3, numSides + 2, 1);
+    quad(mesh->m_vertexIndices, numSides, numSides + 3, numSides + 2, 1);
+    quad(mesh->m_normalIndices, numSides, numSides + 3, numSides + 2, 1);
+
+    // texture sides
+    unsigned int topBase = mesh->m_textureCoords.size();
+    for(int i=0; i <= numSides; ++i) {
+        mesh->m_textureCoords.push_back(
+            Vec2<float>((float)i / (float)numSides,1.0f));
+    }
+    unsigned int bottomBase = mesh->m_textureCoords.size();
+    for(int i=0; i <= numSides; ++i) {
+        mesh->m_textureCoords.push_back(
+            Vec2<float>((float)i / (float)numSides,0.0f));
+    }
+    for(int i=0; i <= numSides; ++i) {
+        quad(mesh->m_textureCoordIndices, topBase+i, bottomBase+i,
+            bottomBase+i+1, topBase+i+1);
+    }
+
 
     // color
     mesh->m_colors.push_back(color);
@@ -318,9 +336,9 @@ Mesh * Mesh::createUnitCube(Vec3<float> color) {
         mesh->m_textureCoordIndices.push_back(0);
         mesh->m_textureCoordIndices.push_back(1);
         mesh->m_textureCoordIndices.push_back(2);
-        mesh->m_textureCoordIndices.push_back(2);
         mesh->m_textureCoordIndices.push_back(0);
-        mesh->m_textureCoordIndices.push_back(1);
+        mesh->m_textureCoordIndices.push_back(2);
+        mesh->m_textureCoordIndices.push_back(3);
     }
 
     // all the colors are the same
@@ -384,37 +402,16 @@ Mesh * Mesh::createUnitPlane(Vec3<float> color) {
     return mesh;
 }
 
-void Mesh::quad(vector<int> & vertexIndices, int v1, int v2, int v3, int v4) {
-    triangle(vertexIndices, v1, v2, v3);
-    triangle(vertexIndices, v1, v3, v4);
+void Mesh::quad(vector<int> & array, int v1, int v2, int v3, int v4) {
+    triangle(array, v1, v2, v3);
+    triangle(array, v1, v3, v4);
 }
 
-void Mesh::quad(vector<int> & vertexIndices, vector<int> & normalIndices,
-    vector<int> & texCoordIndices, int v1, int v2, int v3, int v4)
+void Mesh::triangle(vector<int> & array, int v1, int v2, int v3)
 {
-    triangle(vertexIndices, normalIndices, texCoordIndices, v1, v2, v3);
-    triangle(vertexIndices, normalIndices, texCoordIndices, v1, v3, v4);
-}
-
-void Mesh::triangle(vector<int> & vertexIndices, vector<int> & normalIndices,
-    vector<int> & texCoordIndices, int v1, int v2, int v3)
-{
-    normalIndices.push_back(v1);
-    normalIndices.push_back(v2);
-    normalIndices.push_back(v3);
-    vertexIndices.push_back(v1);
-    vertexIndices.push_back(v2);
-    vertexIndices.push_back(v3);
-    texCoordIndices.push_back(v1);
-    texCoordIndices.push_back(v2);
-    texCoordIndices.push_back(v3);
-}
-
-void Mesh::triangle(vector<int> & vertexIndices, int v1, int v2, int v3)
-{
-    vertexIndices.push_back(v1);
-    vertexIndices.push_back(v2);
-    vertexIndices.push_back(v3);
+    array.push_back(v1);
+    array.push_back(v2);
+    array.push_back(v3);
 }
 
 void Mesh::superHappyFunTime() {

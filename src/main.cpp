@@ -369,7 +369,6 @@ void init() {
 }
 
 void moveLight(Vec3<float> new_pos) {
-    cout << "move light to " << new_pos << endl;
     glPushMatrix();
         glLoadIdentity();
         lightPos[0] = new_pos.x;

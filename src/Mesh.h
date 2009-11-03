@@ -97,6 +97,8 @@ class Mesh : public Drawable, public MeshCalculations {
         static void triangle(vector<int> & array, int v1, int v2,
             int v3);
         void calculatePerSurface(bool normalize);
+        void calcCreasedNormals(int creaseAngle);
+        float getAngle(Vec3<float> v1, Vec3<float> v2);
         
 };
 

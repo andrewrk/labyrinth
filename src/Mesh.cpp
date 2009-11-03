@@ -456,52 +456,118 @@ void Mesh::calculateNormals(MeshCalculations::CalcNormalMethod mode,
 {
     m_normalMode = mode;
 
-    switch(mode) {
-        case Surface:
-            calculatePerSurface(true);
-            break;
-        case Average:
-        case WeightedAverage:
-            calculatePerSurface(mode == MeshCalculations::Average);
-            // init
-            vector<vector<int>*> vertexToFace;
-            for (unsigned int i = 0; i < m_vertices.size(); i++)
-                vertexToFace.push_back(new vector<int>());
+    if( mode == Surface ) {
+        calculatePerSurface(true);
+    } else {
+        calculatePerSurface(mode == MeshCalculations::Average);
+        // init
+        vector<vector<int>*> vertexToFace;
+        for (unsigned int i = 0; i < m_vertices.size(); i++)
+            vertexToFace.push_back(new vector<int>());
 
-            // map vertices to faces
-            for (unsigned int f = 0; f < m_vertexIndices.size(); f += 3)
-                for (int v = 0; v < 3; v++)
-                    vertexToFace[m_vertexIndices[f + v]]->push_back(f);
+        // map vertices to faces
+        for (unsigned int f = 0; f < m_vertexIndices.size(); f += 3)
+            for (int v = 0; v < 3; v++)
+                vertexToFace[m_vertexIndices[f + v]]->push_back(f);
 
-            // calc new m_normals
-            vector< Vec3<float> > newm_normals;
-            for (unsigned int v = 0; v < vertexToFace.size(); v++) {
-                vector<int> * faces = vertexToFace[v];
-                Vec3<float> normal(0.0f);
-                for (unsigned int f = 0; f < faces->size(); f++)
-                    normal += m_normals[m_normalIndices[(*faces)[f]]];
-                normal.normalize();
-                newm_normals.push_back(normal);
-            }
+        // calc new m_normals
+        vector< Vec3<float> > newm_normals;
+        for (unsigned int v = 0; v < vertexToFace.size(); v++) {
+            vector<int> * faces = vertexToFace[v];
+            Vec3<float> normal(0.0f);
+            for (unsigned int f = 0; f < faces->size(); f++)
+                normal += m_normals[m_normalIndices[(*faces)[f]]];
+            normal.normalize();
+            newm_normals.push_back(normal);
+        }
 
-            // use new m_normals
-            m_normals.clear();
-            for (unsigned int i = 0; i < newm_normals.size(); i++)
-                m_normals.push_back(newm_normals[i]);
-            m_normalIndices.clear();
-            for (unsigned int i = 0; i < m_vertexIndices.size(); i++)
-                m_normalIndices.push_back(m_vertexIndices[i]);
+        // use new m_normals
+        m_normals.clear();
+        for (unsigned int i = 0; i < newm_normals.size(); i++)
+            m_normals.push_back(newm_normals[i]);
+        m_normalIndices.clear();
+        for (unsigned int i = 0; i < m_vertexIndices.size(); i++)
+            m_normalIndices.push_back(m_vertexIndices[i]);
 
-            // cleanup
-            for (unsigned int i = 0; i < vertexToFace.size(); i++)
-                delete vertexToFace[i];
-            
-            break;
+        // cleanup
+        for (unsigned int i = 0; i < vertexToFace.size(); i++)
+            delete vertexToFace[i];
+        
     }
+    calcCreasedNormals(creaseAngle);
+}
+
+void Mesh::calcCreasedNormals(int creaseAngle) {
+    float pi = 4.0f * atanf(1.0f);
+    float threshold = pi * creaseAngle / 180.0f;
+
+    // init
+    vector<vector<int>*> vertexToFace;
+    for (unsigned int i = 0; i < m_vertices.size(); i++)
+        vertexToFace.push_back(new vector<int>());
+
+    // map m_vertices to faces
+    for (unsigned int f = 0; f < m_vertexIndices.size(); f += 3)
+        for (int v = 0; v < 3; v++)
+            vertexToFace[m_vertexIndices[f + v]]->push_back(f);
+
+    // angles are indexed the same as m_vertices
+    vector< Vec3<float> > newm_normals;
+    for (unsigned int f = 0; f < m_vertexIndices.size(); f += 3) {
+        for (int v = 0; v < 3; v++) {
+            Vec3<float> oldNormal = m_normals[m_normalIndices[f]];
+            Vec3<float> newNormal = oldNormal;
+            bool renormalizePlease = true;
+            vector<int> * faces = vertexToFace[m_vertexIndices[f + v]];
+            for (int n = 0; n < 2; n++) {
+                // find the neighbor faces and maybe average them
+                vector<int> * wingFaces = vertexToFace[m_vertexIndices[f + (v + n + 1) % 3]];
+                int neighborFace = -1;
+                for (unsigned int i = 0; i < faces->size(); i++) {
+                    int face = (*faces)[i];
+                    if ((unsigned int)face == f)
+                        continue; // that's this face. we know we share this one.
+                    for (unsigned int j = 0; j < wingFaces->size(); j++) {
+                        if (face == (*wingFaces)[j]) {
+                            neighborFace = face;
+                            goto breakToHere;
+                        }
+                    }
+                }
+                breakToHere:
+                if (neighborFace == -1)
+                    continue; // this edge only has one face
+                Vec3<float> neighborNormal = m_normals[m_normalIndices[neighborFace]];
+                float angle = getAngle(oldNormal, neighborNormal);
+                if (angle <= threshold) {
+                    newNormal += neighborNormal;
+                    renormalizePlease = true;
+                }
+            }
+            if (renormalizePlease)
+                newNormal.normalize();
+            newm_normals.push_back(newNormal);
+        }
+    }
+
+    m_normals.clear();
+    m_normalIndices.clear();
+    for (unsigned int i = 0; i < newm_normals.size(); i++) {
+        m_normals.push_back(newm_normals[i]);
+        m_normalIndices.push_back(i);
+    }
+
+    // cleanup
+    for (unsigned int i = 0; i < vertexToFace.size(); i++)
+        delete vertexToFace[i];
 }
 
 void Mesh::setShowNormals(bool value) {
     m_showNormals = value;
+}
+
+float Mesh::getAngle(Vec3<float> v1, Vec3<float> v2) {
+    return acosf(v1.normalized().dot(v2.normalized()));
 }
 
 void Mesh::drawNormalArrows(Vec3<float> scale) {

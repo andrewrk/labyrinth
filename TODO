@@ -1,9 +1,8 @@
 Version 0.2.1 (Project 2)
- * crease angles
-    - menu option: crease angle -> 15, 25, 35, Off
-    - normals only get averaged at a vertex when the angles between the 
-      adjacent triangles is less than then crease angle.
  * bug: the animation stopped - problem with gl lists
+ * bug: crease angles don't actually work
+ * bug: materials don't work. nothing works. it's all broken. and when I click
+   live view, it crashes.
 
 Version 0.2.1
  * MazeView - keep track of textures and delete them when done (memory leak)

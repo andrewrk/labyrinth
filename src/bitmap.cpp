@@ -27,7 +27,7 @@ typedef unsigned char GLubyte;
 
     GLubyte *                          /* O - Bitmap data */
 LoadDIBitmap(const char *filename, /* I - File to load */
-        BITMAPINFO **info)    /* O - Bitmap information */
+        WIN_BITMAPINFO **info)    /* O - Bitmap information */
 {
     FILE             *fp;          /* Open file pointer */
     GLubyte          *bits;        /* Bitmap pixel bits */
@@ -37,7 +37,7 @@ LoadDIBitmap(const char *filename, /* I - File to load */
     int              length;       /* Line length */
     int              bitsize;      /* Size of bitmap */
     int              infosize;     /* Size of header information */
-    BITMAPFILEHEADER header;       /* File header */
+    WIN_BITMAPFILEHEADER header;       /* File header */
 
 
     /* Try opening the file; use "rb" mode to read this *binary* file. */
@@ -59,7 +59,7 @@ LoadDIBitmap(const char *filename, /* I - File to load */
     }
 
     infosize = header.bfOffBits - 18;
-    if ((*info = (BITMAPINFO *)malloc(sizeof(BITMAPINFO))) == NULL)
+    if ((*info = (WIN_BITMAPINFO *)malloc(sizeof(WIN_BITMAPINFO))) == NULL)
     {
         /* Couldn't allocate memory for bitmap info - return NULL... */
         fclose(fp);
@@ -137,7 +137,7 @@ LoadDIBitmap(const char *filename, /* I - File to load */
 
     int                                /* O - 0 = success, -1 = failure */
 SaveDIBitmap(const char *filename, /* I - File to load */
-        BITMAPINFO *info,     /* I - Bitmap information */
+        WIN_BITMAPINFO *info,     /* I - Bitmap information */
         GLubyte    *bits)     /* I - Bitmap data */
 {
     FILE *fp;                      /* Open file pointer */
@@ -159,7 +159,7 @@ SaveDIBitmap(const char *filename, /* I - File to load */
         bitsize = info->bmiHeader.biSizeImage;
 
     /* Figure out the header size */
-    infosize = sizeof(BITMAPINFOHEADER);
+    infosize = sizeof(WIN_BITMAPINFOHEADER);
     switch (info->bmiHeader.biCompression)
     {
         case BI_BITFIELDS :
@@ -179,7 +179,7 @@ SaveDIBitmap(const char *filename, /* I - File to load */
             break;
     }
 
-    size = sizeof(BITMAPFILEHEADER) + infosize + bitsize;
+    size = sizeof(WIN_BITMAPFILEHEADER) + infosize + bitsize;
 
     /* Write the file header, bitmap information, and bitmap pixel data... */
     write_word(fp, BF_TYPE);        /* bfType */

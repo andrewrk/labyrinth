@@ -12,12 +12,12 @@ class Bitmap {
         ~Bitmap();
 
         inline unsigned char * buffer() { return m_bits; }
-        inline BITMAPINFO * info() { return m_info; }
+        inline WIN_BITMAPINFO * info() { return m_info; }
 
     private:
 
         unsigned char * m_bits;
-        BITMAPINFO * m_info;
+        WIN_BITMAPINFO * m_info;
 };
 
 #endif

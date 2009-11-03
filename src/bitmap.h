@@ -24,7 +24,7 @@ typedef struct                       /**** BMP file header structure ****/
     unsigned short bfReserved1;      /* Reserved */
     unsigned short bfReserved2;      /* ... */
     unsigned int   bfOffBits;        /* Offset to bitmap data */
-} BITMAPFILEHEADER;
+} WIN_BITMAPFILEHEADER;
 
 #define BF_TYPE 0x4D42             /* "MB" */
 
@@ -41,7 +41,7 @@ typedef struct                       /**** BMP file info structure ****/
     int            biYPelsPerMeter;  /* Y pixels per meter */
     unsigned int   biClrUsed;        /* Number of colors used */
     unsigned int   biClrImportant;   /* Number of important colors */
-} BITMAPINFOHEADER;
+} WIN_BITMAPINFOHEADER;
 
 /*
  * Constants for the biCompression field...
@@ -58,20 +58,20 @@ typedef struct                       /**** Colormap entry structure ****/
     unsigned char  rgbGreen;         /* Green value */
     unsigned char  rgbRed;           /* Red value */
     unsigned char  rgbReserved;      /* Reserved */
-} RGBQUAD;
+} WIN_RGBQUAD;
 
 typedef struct                       /**** Bitmap information structure ****/
 {
-    BITMAPINFOHEADER bmiHeader;      /* Image header */
-    RGBQUAD          bmiColors[256]; /* Image colormap */
-} BITMAPINFO;
+    WIN_BITMAPINFOHEADER bmiHeader;      /* Image header */
+    WIN_RGBQUAD          bmiColors[256]; /* Image colormap */
+} WIN_BITMAPINFO;
 
 /*
  * Prototypes...
  */
 
-unsigned char *LoadDIBitmap(const char *filename, BITMAPINFO **info);
-int     SaveDIBitmap(const char *filename, BITMAPINFO *info,
+unsigned char *LoadDIBitmap(const char *filename, WIN_BITMAPINFO **info);
+int     SaveDIBitmap(const char *filename, WIN_BITMAPINFO *info,
         unsigned char *bits);
 
 #endif /* !_BITMAP_H_ */

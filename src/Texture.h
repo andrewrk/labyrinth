@@ -2,7 +2,6 @@
 #define _TEXTURE_H_
 
 #include "Bitmap.h"
-#include "bitmap.h"
 
 class Texture {
     public:

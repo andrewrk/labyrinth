@@ -21,8 +21,8 @@ Texture::Texture(Bitmap * bmp)
     gluBuild2DMipmaps(
         GL_TEXTURE_2D,
         GL_RGBA, 
-        bmp->info()->bmiHeader.biWidth,
-        bmp->info()->bmiHeader.biHeight,
+        bmp->width(),
+        bmp->height(),
         GL_RGB,
         GL_UNSIGNED_BYTE,
         bmp->buffer()

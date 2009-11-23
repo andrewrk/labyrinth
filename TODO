@@ -4,3 +4,4 @@ Version 0.2.4
  * bug: materials don't work. nothing works. it's all broken. and when I click
    live view, it crashes.
  * MazeView - keep track of textures and delete them when done (memory leak)
+ * bug:per vertex normals off
